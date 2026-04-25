@@ -164,7 +164,7 @@ const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
           </div>
         </div>
 
-        <script>
+        <script is:inline define:vars={{ API_BASE_URL }}>
     /* eslint-disable indent, unicorn/prefer-dom-node-append, no-unused-vars, @typescript-eslint/no-unused-vars, operator-linebreak, unicorn/prefer-global-this */
     // TOAST & NOTIFICATION STYLES
     const toastStyles = `

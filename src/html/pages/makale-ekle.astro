@@ -96,7 +96,7 @@ const htmlPath = convertPathToHtml(path)
       </main>
       <Footer />
     </div>
-    <script is:inline>
+    <script is:inline define:vars={{ API_BASE_URL }}>
       // TOAST & NOTIFICATION STYLES
       const toastStyles = `
         .toast-notification {

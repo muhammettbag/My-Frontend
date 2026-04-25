@@ -129,7 +129,7 @@ const page = "kategori-index"
     <!--end::App Wrapper-->
     <Scripts path={path} />
 
-    <script is:inline>
+    <script is:inline define:vars={{ API_BASE_URL }}>
       /* eslint-disable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this, unicorn/prefer-string-slice */
       // TOAST & NOTIFICATION STYLES
       const toastStyles = `

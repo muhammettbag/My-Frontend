@@ -325,7 +325,7 @@ const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
       </main>
     </div>
 
-    <script is:inline>
+    <script is:inline define:vars={{ API_BASE_URL }}>
       const articleGrid = document.getElementById('articleGrid');
       const authorListElement = document.getElementById('authorList');
       const articleCountElement = document.getElementById('articleCount');
