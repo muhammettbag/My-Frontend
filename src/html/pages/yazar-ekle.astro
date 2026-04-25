@@ -1,0 +1,236 @@
+---
+import Head from "@components/_head.astro"
+import Footer from "@components/dashboard/_footer.astro"
+import Topbar from "@components/dashboard/_topbar.astro"
+import Sidenav from "@components/dashboard/_sidenav.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../utils/api-config.js"
+import { convertPathToHtml } from "../../utils/index.js"
+
+const title = "AdminLTE v4 | Yazar Ekle"
+const path = "../../dist"
+const mainPage = "dashboard"
+const page = "yazar-ekle"
+const htmlPath = convertPathToHtml(path)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+    <!--end::Toast Container-->
+    <div class="app-wrapper">
+      <Topbar path={path} />
+      <Sidenav path={path} mainPage={mainPage} page={page} />
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Yazar Ekle</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href={htmlPath + "/yazar-index.html"}>Yazarları Listele</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Yazar Ekle</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="card card-success card-outline">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 class="card-title mb-0">Yazar Ekle</h3>
+                <a href={htmlPath + "/yazar-index.html"} class="btn btn-outline-secondary btn-sm">
+                  Yazarları Listele
+                </a>
+              </div>
+              <form id="yazarForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                      <label for="yazarFirstName" class="form-label">Ad</label>
+                      <input id="yazarFirstName" name="firstName" type="text" class="form-control" placeholder="Yazarın adını yazın" required />
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="yazarLastName" class="form-label">Soyadı</label>
+                      <input id="yazarLastName" name="lastName" type="text" class="form-control" placeholder="Yazarın soyadını yazın" required />
+                    </div>
+                    <div class="col-12">
+                      <label for="yazarEmail" class="form-label">Email</label>
+                      <input id="yazarEmail" name="email" type="email" class="form-control" placeholder="email@example.com" required />
+                    </div>
+                    <div class="col-12">
+                      <label for="yazarBio" class="form-label">Biyografi</label>
+                      <textarea id="yazarBio" name="description" class="form-control" rows="10" placeholder="Yazarın biyografisini yazın"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <a href={htmlPath + "/yazar-index.html"} class="btn btn-secondary">İptal</a>
+                  <button type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+    <script is:inline>
+      // TOAST & NOTIFICATION STYLES
+      const toastStyles = `
+        .toast-notification {
+          min-width: 350px;
+          padding: 16px 20px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast-notification.success {
+          background-color: #28a745;
+          color: white;
+          border-left: 4px solid #207535;
+        }
+        
+        .toast-notification.error {
+          background-color: #dc3545;
+          color: white;
+          border-left: 4px solid #a02830;
+        }
+        
+        .toast-notification-bar {
+          margin-top: 8px;
+          width: 100%;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        
+        .toast-notification-progress {
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          animation: progress 4s linear forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `;
+      
+      // Toast Styles Ekle
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = toastStyles;
+      document.head.append(styleSheet);
+
+      // TOAST NOTIFICATION FUNCTION
+      const gosterToast = (mesaj, tip = 'success') => {
+        const container = document.getElementById('toast-container');
+        
+        const toastDiv = document.createElement('div');
+        toastDiv.className = `toast-notification ${tip}`;
+        
+        const messageSpan = document.createElement('div');
+        messageSpan.textContent = mesaj;
+        messageSpan.style.marginBottom = '8px';
+        
+        const barDiv = document.createElement('div');
+        barDiv.className = 'toast-notification-bar';
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'toast-notification-progress';
+        barDiv.append(progressDiv);
+        
+        toastDiv.append(messageSpan);
+        toastDiv.append(barDiv);
+        container.append(toastDiv);
+        
+        setTimeout(() => {
+          toastDiv.style.animation = 'slideOut 0.3s ease-out forwards';
+          setTimeout(() => {
+            toastDiv.remove();
+          }, 300);
+        }, 4000);
+      };
+
+      const API_BASE_URL = "{API_BASE_URL}";
+      const apiUrl = `${API_BASE_URL}/Author/add`;
+      const form = document.getElementById("yazarForm");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const payload = {
+          firstName: document.getElementById("yazarFirstName").value.trim(),
+          lastName: document.getElementById("yazarLastName").value.trim(),
+          email: document.getElementById("yazarEmail").value.trim(),
+          description: document.getElementById("yazarBio").value.trim() || null
+        };
+
+        if (!payload.firstName) {
+          gosterToast('Ad zorunludur.', 'error');
+          return;
+        }
+
+        if (!payload.lastName) {
+          gosterToast('Soyadı zorunludur.', 'error');
+          return;
+        }
+
+        if (!payload.email) {
+          gosterToast('Email zorunludur.', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          gosterToast("Yazar başarıyla eklendi!", "success");
+          form.reset();
+        } catch (error) {
+          console.error("Yazar ekleme hatası:", error);
+          gosterToast(`Yazar eklenemedi: ${error.message}`, "error");
+        }
+      });
+    </script>
+    <Scripts path={path} />
+  </body>
+</html>
+

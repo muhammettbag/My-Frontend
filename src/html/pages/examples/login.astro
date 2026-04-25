@@ -1,0 +1,214 @@
+---
+import Head from "@components/_head.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../../utils/api-config.js"
+
+const title = "AdminLTE 4 | Login Page"
+const path = "../../../dist"
+const htmlPath = "..";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <!--begin::Head-->
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="login-page bg-body-secondary">
+    <div class="login-box">
+      <div class="login-logo">
+        <a href={htmlPath + "/index2.html"}><b>Admin</b>LTE</a>
+      </div>
+      <!-- /.login-logo -->
+      <div class="card">
+        <div class="card-body login-card-body">
+          <p class="login-box-msg">Sign in to start your session</p>
+
+          <form id="loginForm" novalidate>
+            <div class="input-group mb-3">
+              <input id="loginUsername" name="username" type="text" class="form-control" placeholder="Username" required />
+              <div class="input-group-text">
+                <span class="bi bi-person-badge"></span>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                id="loginPassword"
+                name="password"
+                type="password"
+                class="form-control"
+                placeholder="Password"
+                required
+              />
+              <div class="input-group-text">
+                <span class="bi bi-lock-fill"></span>
+              </div>
+            </div>
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-8">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="flexCheckDefault"
+                  />
+                  <label class="form-check-label" for="flexCheckDefault">
+                    Remember Me
+                  </label>
+                </div>
+              </div>
+              <!-- /.col -->
+              <div class="col-4">
+                <div class="d-grid gap-2">
+                  <button id="loginSubmitButton" type="submit" class="btn btn-primary">Sign In</button>
+                </div>
+              </div>
+              <!-- /.col -->
+            </div>
+            <!--end::Row-->
+          </form>
+
+          <div class="social-auth-links text-center mb-3 d-grid gap-2">
+            <p>- OR -</p>
+            <a href="#" class="btn btn-primary">
+              <i class="bi bi-facebook me-2"></i> Sign in using Facebook
+            </a>
+            <a href="#" class="btn btn-danger">
+              <i class="bi bi-google me-2"></i> Sign in using Google+
+            </a>
+          </div>
+          <!-- /.social-auth-links -->
+
+          <p class="mb-1">
+            <a href="forgot-password.html">I forgot my password</a>
+          </p>
+          <p class="mb-0">
+            <a href="register.html" class="btn btn-outline-secondary w-100">
+              Kayıt Ol
+            </a>
+          </p>
+        </div>
+        <!-- /.login-card-body -->
+      </div>
+    </div>
+    <!-- /.login-box -->
+
+    <Scripts path={path} />
+    <script is:inline>
+      const API_BASE_URL = "{API_BASE_URL}"
+      const AUTH_TOKEN_KEY = "adminlte_auth_token"
+      const AUTH_USER_NAME_KEY = "adminlte_user_name"
+      const AUTH_LOGIN_ENDPOINT = `${API_BASE_URL}/Auth/login`
+
+      const extractToken = (responseBody) => {
+        if (!responseBody || typeof responseBody !== "object") return null
+
+        return (
+          responseBody.token ||
+          responseBody.accessToken ||
+          responseBody.jwt ||
+          responseBody?.data?.token ||
+          responseBody?.data?.accessToken ||
+          responseBody?.result?.token ||
+          null
+        )
+      }
+
+      const getHomeUrl = () => new URL("../../index.html", globalThis.location.href).toString()
+
+      const getDisplayNameFromResponse = (responseBody) => {
+        if (!responseBody || typeof responseBody !== "object") {
+          return ""
+        }
+
+        const user = responseBody.user || responseBody.data?.user || responseBody.result?.user || responseBody.data || responseBody.result || {}
+
+        const firstName = (user.firstName || user.firstname || responseBody.firstName || responseBody.firstname || "").toString().trim()
+        const lastName = (user.lastName || user.lastname || responseBody.lastName || responseBody.lastname || "").toString().trim()
+        const fullName = (user.fullName || user.fullname || responseBody.fullName || responseBody.fullname || responseBody.name || "").toString().trim()
+
+        if (firstName || lastName) {
+          return `${firstName} ${lastName}`.trim()
+        }
+
+        return fullName
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("loginForm")
+        const usernameInput = document.getElementById("loginUsername")
+        const passwordInput = document.getElementById("loginPassword")
+        const submitButton = document.getElementById("loginSubmitButton")
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault()
+
+          const username = usernameInput.value.trim()
+          const password = passwordInput.value.trim()
+
+          if (!username || !password) {
+            showToast("Username ve sifre alanlari zorunludur.", "error")
+            return
+          }
+
+          submitButton.disabled = true
+          submitButton.textContent = "Signing In..."
+
+          try {
+            const response = await fetch(AUTH_LOGIN_ENDPOINT, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                username,
+                password
+              })
+            })
+
+            const responseText = await response.text()
+            let parsedBody = null
+
+            if (responseText) {
+              try {
+                parsedBody = JSON.parse(responseText)
+              } catch {
+                parsedBody = { message: responseText }
+              }
+            }
+
+            if (!response.ok) {
+              const backendMessage = parsedBody?.message || parsedBody?.error || "Giris basarisiz."
+              throw new Error(backendMessage)
+            }
+
+            const token = extractToken(parsedBody)
+            if (!token) {
+              throw new Error("Token alinamadi. API donusunu kontrol edin.")
+            }
+
+            const displayName = getDisplayNameFromResponse(parsedBody)
+            localStorage.setItem(AUTH_TOKEN_KEY, token)
+            if (displayName) {
+              localStorage.setItem(AUTH_USER_NAME_KEY, displayName)
+            }
+            showToast("Giriş başarılı.", "success")
+            setTimeout(() => {
+              globalThis.location.replace(getHomeUrl())
+            }, 900)
+          } catch (error) {
+            showToast(error.message || "Beklenmeyen bir hata olustu.", "error")
+          } finally {
+            submitButton.disabled = false
+            submitButton.textContent = "Sign In"
+          }
+        })
+      })
+    </script>
+    <!--end::Script-->
+  </body><!--end::Body-->
+</html>
+

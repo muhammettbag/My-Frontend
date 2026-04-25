@@ -1,0 +1,1021 @@
+---
+import Head from "@components/_head.astro"
+import Footer from "@components/dashboard/_footer.astro"
+import Topbar from "@components/dashboard/_topbar.astro"
+import Sidenav from "@components/dashboard/_sidenav.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../utils/api-config.js"
+
+const title = "AdminLTE v4 | Dashboard"
+const path = "../../dist"
+const mainPage = "dashboard"
+const page = "index";
+
+// Smart path resolution: calculate relative path based on directory depth
+const pathname = Astro.url.pathname;
+const pathSegments = pathname.split('/').filter(segment => segment !== '');
+const depth = pathSegments.length > 0 ? pathSegments.length - 1 : 0;
+const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
+---
+
+<!doctype html>
+<html lang="en">
+  <!--begin::Head-->
+  <head>
+    <Head title={title} path={path} />
+
+    <!-- apexcharts -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
+      integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0="
+      crossorigin="anonymous"
+    />
+
+    <!-- jsvectormap -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
+      integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
+      crossorigin="anonymous"
+    />
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+    <!--end::Toast Container-->
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+      <Topbar path={path} />
+      <Sidenav path={path} mainPage={mainPage} page={page} />
+      <!--begin::App Main-->
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Makale</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="#">Makale</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Makale Ekle / Makale Listesi
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div id="makale-liste-view" class="card card-primary card-outline">
+              <div class="card-header d-flex align-items-center gap-2">
+                <h3 class="card-title mb-0">Makale Listesi</h3>
+                <div class="d-flex gap-2">
+                  <button id="makaleImportButton" type="button" class="btn btn-outline-info btn-sm" onclick="makaleExcelSec()">
+                    Excel Yükle
+                  </button>
+                  <button id="makaleExportButton" type="button" class="btn btn-outline-success btn-sm" onclick="makaleleriExcelIndir()">
+                    Excel İndir
+                  </button>
+                  <a href={deploymentPath + "makale-ekle.html"} class="btn btn-primary btn-sm">
+                    Makale Ekle
+                  </a>
+                </div>
+                <input id="makaleImportFileInput" type="file" class="d-none" accept=".xlsx,.xls" />
+                <button id="makaleRefreshButton" type="button" class="btn btn-outline-secondary btn-sm ms-auto" onclick="makaleleriYenile()">
+                  Yenile
+                </button>
+              </div>
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 80px;">#</th>
+                      <th>Başlık</th>
+                      <th>Rozet</th>
+                      <th style="width: 160px;">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="makaleTablosu">
+                    <tr>
+                      <td colspan="4" class="text-center">Yükleniyor...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex justify-content-center">
+                <nav aria-label="Makale sayfalama">
+                  <ul id="makalePagination" class="pagination pagination-sm mb-0"></ul>
+                </nav>
+              </div>
+            </div>
+
+            <div id="makale-form-view" class="card card-success card-outline" style="display: none;">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 id="makaleFormBaslik" class="card-title mb-0">Makale Ekle</h3>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="listeyiGoster()">
+                  Listeye Dön
+                </button>
+              </div>
+              <form id="makaleForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12 col-md-8">
+                      <label for="makaleTitle" class="form-label">Başlık</label>
+                      <input id="makaleTitle" name="title" type="text" class="form-control" placeholder="Makale başlığını yazın" required />
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <label for="makaleBadge" class="form-label">Rozet</label>
+                      <input id="makaleBadge" name="badge" type="text" class="form-control" placeholder="Yeni, Önemli vb." />
+                    </div>
+                    <div class="col-12">
+                      <label for="makaleContent" class="form-label">İçerik</label>
+                      <textarea id="makaleContent" name="content" class="form-control" rows="8" placeholder="Makale içeriğini buraya yazın"></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label for="makaleImageUrl" class="form-label">Görsel URL</label>
+                      <input id="makaleImageUrl" name="imageUrl" type="url" class="form-control" placeholder="https://..." required />
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="makaleCategoryId" class="form-label">Kategori</label>
+                      <select id="makaleCategoryId" name="categoryId" class="form-select" required>
+                        <option value="">Kategori Seçiniz</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="makaleAuthorId" class="form-label">Yazar</label>
+                      <select id="makaleAuthorId" name="authorId" class="form-select" required>
+                        <option value="">Yazar Seçiniz</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <button type="button" class="btn btn-secondary" onclick="listeyiGoster()">Vazgeç</button>
+                  <button id="makaleFormSubmitBtn" type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <script>
+    /* eslint-disable indent, unicorn/prefer-dom-node-append, no-unused-vars, @typescript-eslint/no-unused-vars, operator-linebreak, unicorn/prefer-global-this */
+    // TOAST & NOTIFICATION STYLES
+    const toastStyles = `
+      .toast-notification {
+        min-width: 350px;
+        padding: 16px 20px;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-size: 14px;
+        font-weight: 500;
+        animation: slideIn 0.3s ease-out;
+      }
+      
+      .toast-notification.success {
+        background-color: #28a745;
+        color: white;
+        border-left: 4px solid #207535;
+      }
+      
+      .toast-notification.error {
+        background-color: #dc3545;
+        color: white;
+        border-left: 4px solid #a02830;
+      }
+      
+      .toast-notification-bar {
+        margin-top: 8px;
+        width: 100%;
+        height: 3px;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      
+      .toast-notification-progress {
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        animation: progress 4s linear forwards;
+      }
+      
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes progress {
+        from {
+          width: 100%;
+        }
+        to {
+          width: 0%;
+        }
+      }
+    `;
+    
+    // Toast Styles Ekle
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = toastStyles;
+    document.head.appendChild(styleSheet);
+
+    // TOAST NOTIFICATION FUNCTION
+    const gosterToast = (mesaj, tip = 'success') => {
+      const container = document.getElementById('toast-container');
+      
+      const toastDiv = document.createElement('div');
+      toastDiv.className = `toast-notification ${tip}`;
+      
+      const messageSpan = document.createElement('div');
+      messageSpan.textContent = mesaj;
+      messageSpan.style.marginBottom = '8px';
+      
+      const barDiv = document.createElement('div');
+      barDiv.className = 'toast-notification-bar';
+      const progressDiv = document.createElement('div');
+      progressDiv.className = 'toast-notification-progress';
+      barDiv.appendChild(progressDiv);
+      
+      toastDiv.appendChild(messageSpan);
+      toastDiv.appendChild(barDiv);
+      container.appendChild(toastDiv);
+      
+      setTimeout(() => {
+        toastDiv.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => {
+          toastDiv.remove();
+        }, 300);
+      }, 4000);
+    };
+
+    let aktifSayfa = 1;
+    let sayfaBoyutu = 10;
+    let toplamSayfa = 1;
+    let duzenlenecekMakaleId = null;
+    let sonYuklenenMakaleler = [];
+    const API_BASE_URL = "{API_BASE_URL}";
+
+    const formElement = document.getElementById('makaleForm');
+    const formBaslikElement = document.getElementById('makaleFormBaslik');
+    const formSubmitButtonElement = document.getElementById('makaleFormSubmitBtn');
+    const titleInputElement = document.getElementById('makaleTitle');
+    const badgeInputElement = document.getElementById('makaleBadge');
+    const contentInputElement = document.getElementById('makaleContent');
+    const imageUrlInputElement = document.getElementById('makaleImageUrl');
+    const categoryIdSelectElement = document.getElementById('makaleCategoryId');
+    const authorIdSelectElement = document.getElementById('makaleAuthorId');
+    const importFileInputElement = document.getElementById('makaleImportFileInput');
+    const importButtonElement = document.getElementById('makaleImportButton');
+
+    let kategorilerListesi = [];
+    let yazarlarListesi = [];
+
+    const addEndpoint = `${API_BASE_URL}/Article/add`;
+    const updateEndpoint = `${API_BASE_URL}/Article/Update`;
+    const exportEndpoint = `${API_BASE_URL}/Article/ExportArticles`;
+    const importEndpoint = `${API_BASE_URL}/Article/Import`;
+
+    const kategorileriYukle = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/Category/GetAll`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        
+        // Response format'ını handle et - multiple format'ı destekle
+        let categoryList = [];
+        if (Array.isArray(data)) {
+          categoryList = data;
+        } else if (data?.data && Array.isArray(data.data)) {
+          categoryList = data.data;
+        } else if (data?.$values && Array.isArray(data.$values)) {
+          categoryList = data.$values;
+        } else if (data?.items && Array.isArray(data.items)) {
+          categoryList = data.items;
+        } else if (data?.Items && Array.isArray(data.Items)) {
+          categoryList = data.Items;
+        }
+        
+        if (categoryList.length > 0) {
+          kategorilerListesi = categoryList;
+          doldurKategoriDropdown(categoryList);
+          console.log('Kategoriler yüklendi:', categoryList.length);
+        } else {
+          console.warn('Kategoriler yüklendi ama liste boş');
+        }
+      } catch (error) {
+        console.error('Kategoriler yüklenemedi:', error);
+      }
+    };
+
+    const yazarlariYukle = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/Author/GetAll`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        
+        // Response format'ını handle et - multiple format'ı destekle
+        let authorList = [];
+        if (Array.isArray(data)) {
+          authorList = data;
+        } else if (data?.data && Array.isArray(data.data)) {
+          authorList = data.data;
+        } else if (data?.$values && Array.isArray(data.$values)) {
+          authorList = data.$values;
+        } else if (data?.items && Array.isArray(data.items)) {
+          authorList = data.items;
+        } else if (data?.Items && Array.isArray(data.Items)) {
+          authorList = data.Items;
+        }
+        
+        if (authorList.length > 0) {
+          yazarlarListesi = authorList;
+          doldurYazarDropdown(authorList);
+          console.log('Yazarlar yüklendi:', authorList.length);
+        } else {
+          console.warn('Yazarlar yüklendi ama liste boş');
+        }
+      } catch (error) {
+        console.error('Yazarlar yüklenemedi:', error);
+      }
+    };
+
+    const doldurKategoriDropdown = (kategoriler) => {
+      const options = [];
+      options.push(`<option value="">Kategori Seçiniz</option>`);
+      
+      kategoriler.forEach((kategori, index) => {
+        const catId = kategori.id || kategori.categoryId || kategori.Id || kategori.CategoryId || '';
+        const catName = kategori.name || kategori.Name || kategori.title || kategori.Title || 'Bilinmiyen Kategori';
+        
+        if (catId) {
+          options.push(`<option value="${catId}">${index + 1}. ${catName}</option>`);
+        }
+      });
+      
+      categoryIdSelectElement.innerHTML = options.join('');
+    };
+
+    const doldurYazarDropdown = (yazarlar) => {
+      const options = [];
+      options.push(`<option value="">Yazar Seçiniz</option>`);
+      
+      yazarlar.forEach((yazar, index) => {
+        const authId = yazar.id || yazar.authorId || yazar.Id || yazar.AuthorId || '';
+        const authName = yazar.name || yazar.Name || yazar.firstName || yazar.FirstName || yazar.fullName || yazar.FullName || 'Bilinmiyen Yazar';
+        
+        if (authId) {
+          options.push(`<option value="${authId}">${index + 1}. ${authName}</option>`);
+        }
+      });
+      
+      authorIdSelectElement.innerHTML = options.join('');
+    };
+
+    const formuEkleModunaAl = () => {
+      duzenlenecekMakaleId = null;
+      if (formBaslikElement) {
+        formBaslikElement.textContent = 'Makale Ekle';
+      }
+
+      if (formSubmitButtonElement) {
+        formSubmitButtonElement.textContent = 'Kaydet';
+        formSubmitButtonElement.classList.remove('btn-warning');
+        formSubmitButtonElement.classList.add('btn-success');
+      }
+      
+      // Dropdown'ları sıfırla
+      if (categoryIdSelectElement) {
+        categoryIdSelectElement.value = '';
+      }
+      if (authorIdSelectElement) {
+        authorIdSelectElement.value = '';
+      }
+    };
+
+    window.makaleleriExcelIndir = async function() {
+      const exportButton = document.getElementById('makaleExportButton');
+
+      if (exportButton) {
+        exportButton.disabled = true;
+        exportButton.textContent = 'İndiriliyor...';
+      }
+
+      try {
+        const response = await fetch(exportEndpoint, {
+          method: 'GET'
+        });
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        if (!blob || blob.size === 0) {
+          throw new Error('Boş dosya döndü.');
+        }
+
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = 'Makaleler.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(downloadUrl);
+
+        gosterToast('Makaleler Excel olarak indirildi.', 'success');
+      } catch (error) {
+        console.error('Makale Excel indirme hatası:', error);
+        gosterToast(`Excel indirilemedi: ${error.message}`, 'error');
+      } finally {
+        if (exportButton) {
+          exportButton.disabled = false;
+          exportButton.textContent = 'Excel İndir';
+        }
+      }
+    };
+
+    window.makaleleriYenile = function() {
+      kategorileriYukle();
+      yazarlariYukle();
+      makaleleriGetir(aktifSayfa);
+    };
+
+    window.makaleExcelSec = function() {
+      if (!importFileInputElement) {
+        gosterToast('Dosya seçici bulunamadı.', 'error');
+        return;
+      }
+
+      importFileInputElement.click();
+    };
+
+    window.makaleExcelYukle = async function(file) {
+      if (!file) {
+        gosterToast('Lütfen bir Excel dosyası seçin.', 'error');
+        return;
+      }
+
+      const fileName = (file.name || '').toLowerCase();
+      if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+        gosterToast('Sadece .xlsx veya .xls dosyası yükleyebilirsiniz.', 'error');
+        return;
+      }
+
+      if (importButtonElement) {
+        importButtonElement.disabled = true;
+        importButtonElement.textContent = 'Yükleniyor...';
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(importEndpoint, {
+          method: 'POST',
+          body: formData
+        });
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+          throw new Error(responseText || `HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        gosterToast(responseText || 'Makaleler başarıyla içeri aktarıldı.', 'success');
+        makaleleriYenile();
+      } catch (error) {
+        console.error('Makale Excel içeri aktarma hatası:', error);
+        gosterToast(`Excel yüklenemedi: ${error.message}`, 'error');
+      } finally {
+        if (importButtonElement) {
+          importButtonElement.disabled = false;
+          importButtonElement.textContent = 'Excel Yükle';
+        }
+
+        if (importFileInputElement) {
+          importFileInputElement.value = '';
+        }
+      }
+    };
+
+    if (importFileInputElement) {
+      importFileInputElement.addEventListener('change', (event) => {
+        const selectedFile = event.target?.files?.[0];
+        if (selectedFile) {
+          makaleExcelYukle(selectedFile);
+        }
+      });
+    }
+
+    // 1. SAYFA AÇILIR AÇILMAZ ÇALIŞACAK KOD (Verileri getiren tetikleyici)
+    document.addEventListener("DOMContentLoaded", () => {
+        makaleleriYenile(); // Sayfa yüklendiğinde hemen API'ye git
+    });
+
+    formElement.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        title: titleInputElement.value.trim(),
+        badge: badgeInputElement.value.trim() || null,
+        content: contentInputElement.value.trim(),
+        imageUrl: imageUrlInputElement.value.trim(),
+        categoryId: categoryIdSelectElement.value,
+        authorId: authorIdSelectElement.value
+      };
+
+      if (!payload.title) {
+        gosterToast('Başlık zorunludur.', 'error');
+        return;
+      }
+
+      if (!payload.imageUrl) {
+        gosterToast('Görsel URL zorunludur.', 'error');
+        return;
+      }
+
+      if (!payload.categoryId) {
+        gosterToast('Kategori zorunludur.', 'error');
+        return;
+      }
+
+      if (!payload.authorId) {
+        gosterToast('Yazar zorunludur.', 'error');
+        return;
+      }
+
+      const isUpdateMode = Boolean(duzenlenecekMakaleId);
+      const requestBody = isUpdateMode
+        ? { ...payload, id: duzenlenecekMakaleId }
+        : payload;
+
+      const requestUrl = isUpdateMode ? updateEndpoint : addEndpoint;
+      const requestMethod = isUpdateMode ? 'PUT' : 'POST';
+
+      try {
+        const response = await fetch(requestUrl, {
+          method: requestMethod,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+        }
+
+        const successMsg = isUpdateMode ? 'Makale başarıyla güncellendi!' : 'Makale başarıyla eklendi!';
+        gosterToast(successMsg, 'success');
+        formElement.reset();
+        formuEkleModunaAl();
+        listeyiGoster();
+      } catch (error) {
+        console.error('Makale kaydetme hatası:', error);
+        gosterToast(`Makale kaydedilemedi: ${error.message}`, 'error');
+      }
+    });
+
+    // 2. GÖRÜNÜM DEĞİŞTİRİCİLER
+    window.formuGoster = function() {
+        document.getElementById('makale-liste-view').style.display = 'none';
+        document.getElementById('makale-form-view').style.display = 'block';
+        document.getElementById('makaleForm').reset(); // Formu temizle
+      formuEkleModunaAl();
+    };
+
+    window.listeyiGoster = function() {
+        document.getElementById('makale-form-view').style.display = 'none';
+        document.getElementById('makale-liste-view').style.display = 'block';
+      formuEkleModunaAl();
+      makaleleriGetir(aktifSayfa); // Listeye dönünce verileri tazele!
+    };
+
+    window.makaleDuzenle = function(makaleId) {
+      const secilenMakale = sonYuklenenMakaleler.find((makale) => {
+        const id = makale?.id || makale?.articleId || makale?.Id || makale?.ArticleId;
+        return String(id) === String(makaleId);
+      });
+
+      if (!secilenMakale) {
+        gosterToast('Düzenlenecek makale bulunamadı.', 'error');
+        return;
+      }
+
+      duzenlenecekMakaleId = secilenMakale.id || secilenMakale.articleId || secilenMakale.Id || secilenMakale.ArticleId;
+      titleInputElement.value = secilenMakale.title || secilenMakale.Title || '';
+      badgeInputElement.value = secilenMakale.badge || secilenMakale.Badge || '';
+      contentInputElement.value = secilenMakale.content || secilenMakale.Content || '';
+      imageUrlInputElement.value = secilenMakale.imageUrl || secilenMakale.ImageUrl || '';
+      
+      const categoryId = secilenMakale.categoryId || secilenMakale.CategoryId;
+      const authorId = secilenMakale.authorId || secilenMakale.AuthorId;
+      
+      if (categoryId) {
+        categoryIdSelectElement.value = categoryId;
+      }
+      
+      if (authorId) {
+        authorIdSelectElement.value = authorId;
+      }
+
+      if (formBaslikElement) {
+        formBaslikElement.textContent = 'Makale Düzenle';
+      }
+
+      if (formSubmitButtonElement) {
+        formSubmitButtonElement.textContent = 'Güncelle';
+        formSubmitButtonElement.classList.remove('btn-success');
+        formSubmitButtonElement.classList.add('btn-warning');
+      }
+
+      document.getElementById('makale-liste-view').style.display = 'none';
+      document.getElementById('makale-form-view').style.display = 'block';
+    };
+
+    window.makalaSil = async function(makaleId) {
+      // Silme işlemini onaylamadan önce soru sor
+      const onay = confirm('Bu makaleyi silmek istediğinizden emin misiniz?');
+      if (!onay) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/Article/Delete/${makaleId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+        }
+
+        gosterToast('Makale başarıyla silindi!', 'success');
+        makaleleriGetir(aktifSayfa);
+      } catch (error) {
+        console.error('Makale silme hatası:', error);
+        gosterToast(`Makale silinemedi: ${error.message}`, 'error');
+      }
+    };
+
+    window.sayfayaGit = function(sayfaNo) {
+      if (sayfaNo < 1 || sayfaNo > toplamSayfa) {
+        return;
+      }
+
+      aktifSayfa = sayfaNo;
+      makaleleriGetir(aktifSayfa);
+    };
+
+    const sayfalamaCiz = () => {
+      const pagination = document.getElementById('makalePagination');
+
+      if (!pagination || toplamSayfa <= 1) {
+        if (pagination) {
+          pagination.innerHTML = '';
+        }
+        return;
+      }
+
+      let html = '';
+      for (let i = 1; i <= toplamSayfa; i++) {
+        html += `
+          <li class="page-item ${i === aktifSayfa ? 'active' : ''}">
+          <a class="page-link" href="#" onclick="sayfayaGit(${i}); return false;">${i}</a>
+          </li>
+        `;
+      }
+
+      pagination.innerHTML = html;
+    };
+
+    // 3. API'DEN VERİ ÇEKME MOTORU
+    window.makaleleriGetir = function(sayfaNo = aktifSayfa) {
+      aktifSayfa = sayfaNo;
+
+        const tablo = document.getElementById('makaleTablosu');
+      const pagination = document.getElementById('makalePagination');
+        tablo.innerHTML = '<tr><td colspan="4" class="text-center">Yükleniyor...</td></tr>';
+      if (pagination) {
+        pagination.innerHTML = '';
+      }
+
+      const listEndpoints = [
+       
+        `${API_BASE_URL}/Article/GetAll`
+      ];
+
+      const fetchFromEndpoint = async (endpoint) => {
+      const response = await fetch(`${endpoint}?page=${aktifSayfa}&pageSize=${sayfaBoyutu}`);
+
+        if (response.status === 404) {
+          return null;
+        }
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+        }
+
+        const responseText = await response.text();
+
+        if (!responseText) {
+          return [];
+        }
+
+        try {
+          return JSON.parse(responseText);
+        } catch {
+          throw new Error('API JSON döndürmedi. Yanıt formatını kontrol et.');
+        }
+      };
+
+      (async () => {
+        for (const endpoint of listEndpoints) {
+          const data = await fetchFromEndpoint(endpoint);
+          if (data !== null) {
+            return data;
+          }
+        }
+
+        throw new Error('HTTP 404: Uygun liste endpointi bulunamadı.');
+      })()
+        .then(data => {
+          tablo.innerHTML = ''; // Yükleniyor yazısını sil
+
+          // API bir dizi veya { items: [...] } / { Items: [...] } döndürebilir
+          const liste = Array.isArray(data)
+            ? data
+            : (data?.items || data?.Items || []);
+
+          sonYuklenenMakaleler = liste;
+
+          sayfaBoyutu = data?.pageSize || data?.PageSize || sayfaBoyutu;
+          aktifSayfa = data?.page || data?.Page || aktifSayfa;
+
+          const totalCount = data?.totalCount || data?.TotalCount || liste.length;
+          toplamSayfa = data?.totalPages || data?.TotalPages || Math.max(1, Math.ceil(totalCount / sayfaBoyutu));
+                
+                if (!liste || liste.length === 0) {
+                    tablo.innerHTML = '<tr><td colspan="4" class="text-center">Henüz makale yok.</td></tr>';
+              sayfalamaCiz();
+                    return;
+                }
+
+                // Verileri tabloya döşe
+                liste.forEach((makale, index) => {
+              const satirNo = ((aktifSayfa - 1) * sayfaBoyutu) + index + 1;
+                const makaleId = makale.id || makale.articleId || makale.Id || makale.ArticleId || '';
+                    tablo.innerHTML += `
+                        <tr>
+                <td>${satirNo}</td>
+                            <td>${makale.title}</td>
+                            <td>${makale.badge || '-'}</td>
+                            <td>
+                        <button class="btn btn-warning btn-sm" onclick="makaleDuzenle('${makaleId}')">Düzenle</button>
+                                <button class="btn btn-danger btn-sm" onclick="makalaSil('${makaleId}')">Sil</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            sayfalamaCiz();
+            })
+            .catch(error => {
+                console.error("Hata:", error);
+            toplamSayfa = 1;
+                tablo.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Makale listesi alınamadı: ${error.message}</td></tr>`;
+            });
+    };
+    /* eslint-enable indent, unicorn/prefer-dom-node-append, no-unused-vars, @typescript-eslint/no-unused-vars, operator-linebreak, unicorn/prefer-global-this */
+        </script>
+      
+      </main>
+      <!--end::App Main-->
+      <Footer />
+    </div>
+    <!--end::App Wrapper-->
+    <Scripts path={path} />
+
+    <!-- OPTIONAL SCRIPTS -->
+
+    <!-- sortablejs -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"
+      crossorigin="anonymous"></script>
+
+    <!-- sortablejs -->
+    <script is:inline>
+new Sortable(document.querySelector('.connectedSortable'), {
+  group: 'shared',
+  handle: '.card-header'
+})
+
+const cardHeaders = document.querySelectorAll(
+  '.connectedSortable .card-header'
+)
+cardHeaders.forEach(cardHeader => {
+  cardHeader.style.cursor = 'move'
+})
+    </script>
+
+    <!-- apexcharts -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
+      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
+      crossorigin="anonymous"></script>
+
+    <!-- ChartJS -->
+    <script is:inline>
+// NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
+// IT'S ALL JUST JUNK FOR DEMO
+// ++++++++++++++++++++++++++++++++++++++++++
+
+const sales_chart_options = {
+  series: [
+    {
+      name: 'Digital Goods',
+      data: [28, 48, 40, 19, 86, 27, 90]
+    },
+    {
+      name: 'Electronics',
+      data: [65, 59, 80, 81, 56, 55, 40]
+    }
+  ],
+  chart: {
+    height: 300,
+    type: 'area',
+    toolbar: {
+      show: false
+    }
+  },
+  legend: {
+    show: false
+  },
+  colors: ['#0d6efd', '#20c997'],
+  dataLabels: {
+    enabled: false
+  },
+  stroke: {
+    curve: 'smooth'
+  },
+  xaxis: {
+    type: 'datetime',
+    categories: [
+      '2023-01-01',
+      '2023-02-01',
+      '2023-03-01',
+      '2023-04-01',
+      '2023-05-01',
+      '2023-06-01',
+      '2023-07-01'
+    ]
+  },
+  tooltip: {
+    x: {
+      format: 'MMMM yyyy'
+    }
+  }
+}
+
+const sales_chart = new ApexCharts(
+  document.querySelector('#revenue-chart'),
+  sales_chart_options
+)
+sales_chart.render()
+    </script>
+
+    <!-- jsvectormap -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
+      integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
+      crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
+      integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
+      crossorigin="anonymous"></script>
+
+    <!-- jsvectormap -->
+    <script is:inline>
+      // World map by jsVectorMap
+      new jsVectorMap({
+        selector: '#world-map',
+        map: 'world'
+      });
+
+      // Sparkline charts
+      const option_sparkline1 = {
+        series: [
+          {
+            data: [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021]
+          }
+        ],
+        chart: {
+          type: 'area',
+          height: 50,
+          sparkline: {
+            enabled: true
+          }
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        fill: {
+          opacity: 0.3
+        },
+        yaxis: {
+          min: 0
+        },
+        colors: ['#DCE6EC']
+      }
+
+      const sparkline1 = new ApexCharts(
+        document.querySelector('#sparkline-1'),
+        option_sparkline1
+      )
+      sparkline1.render()
+
+      const option_sparkline2 = {
+        series: [
+          {
+            data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921]
+          }
+        ],
+        chart: {
+          type: 'area',
+          height: 50,
+          sparkline: {
+            enabled: true
+          }
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        fill: {
+          opacity: 0.3
+        },
+        yaxis: {
+          min: 0
+        },
+        colors: ['#DCE6EC']
+      }
+
+      const sparkline2 = new ApexCharts(
+        document.querySelector('#sparkline-2'),
+        option_sparkline2
+      )
+      sparkline2.render()
+
+      const option_sparkline3 = {
+        series: [
+          {
+            data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21]
+          }
+        ],
+        chart: {
+          type: 'area',
+          height: 50,
+          sparkline: {
+            enabled: true
+          }
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        fill: {
+          opacity: 0.3
+        },
+        yaxis: {
+          min: 0
+        },
+        colors: ['#DCE6EC']
+      }
+
+      const sparkline3 = new ApexCharts(
+        document.querySelector('#sparkline-3'),
+        option_sparkline3
+      )
+      sparkline3.render()
+    </script>
+  </body>
+  <!--end::Body-->
+</html>
+

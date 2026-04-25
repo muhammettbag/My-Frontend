@@ -1,0 +1,351 @@
+---
+import Head from "@components/_head.astro"
+import Footer from "@components/dashboard/_footer.astro"
+import Topbar from "@components/dashboard/_topbar.astro"
+import Sidenav from "@components/dashboard/_sidenav.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../utils/api-config.js"
+import { convertPathToHtml } from "../../utils/index.js"
+
+const title = "AdminLTE v4 | Makale Ekle"
+const path = "../../dist"
+const mainPage = "dashboard"
+const page = "makale-ekle"
+const htmlPath = convertPathToHtml(path)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+    <!--end::Toast Container-->
+    <div class="app-wrapper">
+      <Topbar path={path} />
+      <Sidenav path={path} mainPage={mainPage} page={page} />
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Makale Ekle</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href={htmlPath + "/index.html"}>Makaleleri Listele</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Makale Ekle</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="card card-success card-outline">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 class="card-title mb-0">Makale Ekle</h3>
+                <a href={htmlPath + "/index.html"} class="btn btn-outline-secondary btn-sm">
+                  Makaleleri Listele
+                </a>
+              </div>
+              <form id="makaleForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12 col-lg-8">
+                      <label for="makaleTitle" class="form-label">Başlık</label>
+                      <input id="makaleTitle" name="title" type="text" class="form-control" placeholder="Makale başlığını yazın" required />
+                    </div>
+                    <div class="col-12 col-lg-4">
+                      <label for="makaleBadge" class="form-label">Rozet</label>
+                      <input id="makaleBadge" name="badge" type="text" class="form-control" placeholder="KİTAP, VİDEO, YENİ" />
+                    </div>
+                    <div class="col-12">
+                      <label for="makaleContent" class="form-label">İçerik</label>
+                      <textarea id="makaleContent" name="content" class="form-control" rows="10" placeholder="Makale içeriğini buraya yazın"></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label for="makaleImageUrl" class="form-label">Görsel URL</label>
+                      <input id="makaleImageUrl" name="imageUrl" type="url" class="form-control" placeholder="https://..." />
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="makaleCategoryId" class="form-label">Kategori</label>
+                      <select id="makaleCategoryId" name="categoryId" class="form-select" required>
+                        <option value="">Kategori Seçiniz</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="makaleAuthorId" class="form-label">Yazar</label>
+                      <select id="makaleAuthorId" name="authorId" class="form-select" required>
+                        <option value="">Yazar Seçiniz</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <a href={htmlPath + "/index.html"} class="btn btn-secondary">İptal</a>
+                  <button type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+    <script is:inline>
+      // TOAST & NOTIFICATION STYLES
+      const toastStyles = `
+        .toast-notification {
+          min-width: 350px;
+          padding: 16px 20px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast-notification.success {
+          background-color: #28a745;
+          color: white;
+          border-left: 4px solid #207535;
+        }
+        
+        .toast-notification.error {
+          background-color: #dc3545;
+          color: white;
+          border-left: 4px solid #a02830;
+        }
+        
+        .toast-notification-bar {
+          margin-top: 8px;
+          width: 100%;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        
+        .toast-notification-progress {
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          animation: progress 4s linear forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `;
+      
+      // Toast Styles Ekle
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = toastStyles;
+      document.head.append(styleSheet);
+
+      // TOAST NOTIFICATION FUNCTION
+      const gosterToast = (mesaj, tip = 'success') => {
+        const container = document.getElementById('toast-container');
+        
+        const toastDiv = document.createElement('div');
+        toastDiv.className = `toast-notification ${tip}`;
+        
+        const messageSpan = document.createElement('div');
+        messageSpan.textContent = mesaj;
+        messageSpan.style.marginBottom = '8px';
+        
+        const barDiv = document.createElement('div');
+        barDiv.className = 'toast-notification-bar';
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'toast-notification-progress';
+        barDiv.append(progressDiv);
+        
+        toastDiv.append(messageSpan);
+        toastDiv.append(barDiv);
+        container.append(toastDiv);
+        
+        setTimeout(() => {
+          toastDiv.style.animation = 'slideOut 0.3s ease-out forwards';
+          setTimeout(() => {
+            toastDiv.remove();
+          }, 300);
+        }, 4000);
+      };
+
+      const API_BASE_URL = "{API_BASE_URL}";
+    const apiUrl = `${API_BASE_URL}/Article/add`;
+      const form = document.getElementById("makaleForm");
+      const categorySelect = document.getElementById("makaleCategoryId");
+      const authorSelect = document.getElementById("makaleAuthorId");
+
+      // Kategorileri Yükle
+      const kategorileriYukle = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/Category/GetAll`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          
+          let categoryList = [];
+          if (Array.isArray(data)) {
+            categoryList = data;
+          } else if (data?.data && Array.isArray(data.data)) {
+            categoryList = data.data;
+          } else if (data?.$values && Array.isArray(data.$values)) {
+            categoryList = data.$values;
+          } else if (data?.items && Array.isArray(data.items)) {
+            categoryList = data.items;
+          } else if (data?.Items && Array.isArray(data.Items)) {
+            categoryList = data.Items;
+          }
+          
+          if (categoryList.length > 0) {
+            doldurKategoriDropdown(categoryList);
+          }
+        } catch (error) {
+          console.error('Kategoriler yüklenemedi:', error);
+          gosterToast('Kategoriler yüklenemedi', 'error');
+        }
+      };
+
+      // Yazarları Yükle
+      const yazarlariYukle = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/Author/GetAll`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          
+          let authorList = [];
+          if (Array.isArray(data)) {
+            authorList = data;
+          } else if (data?.data && Array.isArray(data.data)) {
+            authorList = data.data;
+          } else if (data?.$values && Array.isArray(data.$values)) {
+            authorList = data.$values;
+          } else if (data?.items && Array.isArray(data.items)) {
+            authorList = data.items;
+          } else if (data?.Items && Array.isArray(data.Items)) {
+            authorList = data.Items;
+          }
+          
+          if (authorList.length > 0) {
+            doldurYazarDropdown(authorList);
+          }
+        } catch (error) {
+          console.error('Yazarlar yüklenemedi:', error);
+          gosterToast('Yazarlar yüklenemedi', 'error');
+        }
+      };
+
+      // Kategori Dropdown Doldur
+      const doldurKategoriDropdown = (kategoriler) => {
+        const options = [];
+        options.push(`<option value="">Kategori Seçiniz</option>`);
+        
+        kategoriler.forEach((kategori, index) => {
+          const catId = kategori.id || kategori.categoryId || kategori.Id || kategori.CategoryId || '';
+          const catName = kategori.name || kategori.Name || kategori.title || kategori.Title || 'Bilinmiyen Kategori';
+          
+          if (catId) {
+            options.push(`<option value="${catId}">${index + 1}. ${catName}</option>`);
+          }
+        });
+        
+        categorySelect.innerHTML = options.join('');
+      };
+
+      // Yazar Dropdown Doldur
+      const doldurYazarDropdown = (yazarlar) => {
+        const options = [];
+        options.push(`<option value="">Yazar Seçiniz</option>`);
+        
+        yazarlar.forEach((yazar, index) => {
+          const authId = yazar.id || yazar.authorId || yazar.Id || yazar.AuthorId || '';
+          const authName = yazar.name || yazar.Name || yazar.firstName || yazar.FirstName || yazar.fullName || yazar.FullName || 'Bilinmiyen Yazar';
+          
+          if (authId) {
+            options.push(`<option value="${authId}">${index + 1}. ${authName}</option>`);
+          }
+        });
+        
+        authorSelect.innerHTML = options.join('');
+      };
+
+      // Sayfa yüklendiğinde kategorileri ve yazarları çek
+      document.addEventListener("DOMContentLoaded", () => {
+        kategorileriYukle();
+        yazarlariYukle();
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const payload = {
+          title: document.getElementById("makaleTitle").value.trim(),
+          content: document.getElementById("makaleContent").value.trim(),
+          imageUrl: document.getElementById("makaleImageUrl").value.trim() || null,
+          categoryId: categorySelect.value,
+          badge: document.getElementById("makaleBadge").value.trim() || null,
+          authorId: authorSelect.value
+        };
+
+        if (!payload.title) {
+          gosterToast('Başlık zorunludur.', 'error');
+          return;
+        }
+
+        if (!payload.categoryId) {
+          gosterToast('Kategori zorunludur.', 'error');
+          return;
+        }
+
+        if (!payload.authorId) {
+          gosterToast('Yazar zorunludur.', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          gosterToast("Makale başarıyla eklendi!", "success");
+          form.reset();
+          categorySelect.value = '';
+          authorSelect.value = '';
+        } catch (error) {
+          console.error("Makale ekleme hatası:", error);
+          gosterToast(`Makale eklenemedi: ${error.message}`, "error");
+        }
+      });
+    </script>
+    <Scripts path={path} />
+  </body>
+</html>

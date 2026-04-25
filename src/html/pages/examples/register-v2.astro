@@ -1,0 +1,236 @@
+---
+import Head from "@components/_head.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../../utils/api-config.js"
+
+const title = "AdminLTE 4 | Register Page v2"
+const path = "../../../dist"
+const htmlPath = "..";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <!--begin::Head-->
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="register-page bg-body-secondary">
+    <div class="register-box">
+      <!-- /.register-logo -->
+      <div class="card card-outline card-primary">
+        <div class="card-header">
+          <a href={htmlPath + "/index2.html"} class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
+            <h1 class="mb-0">
+              <b>Admin</b>LTE
+            </h1>
+          </a>
+        </div>
+        <div class="card-body register-card-body">
+          <p class="register-box-msg">Kayıt olmak için formu doldurun</p>
+
+          <form id="registerForm" novalidate>
+            <div class="input-group mb-1">
+              <div class="form-floating">
+                <input id="registerFirstName" name="firstName" type="text" class="form-control" placeholder="" required />
+                <label for="registerFirstName">Ad</label>
+              </div>
+              <div class="input-group-text">
+                <span class="bi bi-person"></span>
+              </div>
+            </div>
+            <div class="input-group mb-1">
+              <div class="form-floating">
+                <input id="registerLastName" name="lastName" type="text" class="form-control" placeholder="" required />
+                <label for="registerLastName">Soyad</label>
+              </div>
+              <div class="input-group-text">
+                <span class="bi bi-person-badge"></span>
+              </div>
+            </div>
+            <div class="input-group mb-1">
+              <div class="form-floating">
+                <input id="registerEmail" name="email" type="email" class="form-control" placeholder="" required />
+                <label for="registerEmail">Email</label>
+              </div>
+              <div class="input-group-text">
+                <span class="bi bi-envelope"></span>
+              </div>
+            </div>
+            <div class="input-group mb-1">
+              <div class="form-floating">
+                <input
+                  id="registerPassword"
+                  name="password"
+                  type="password"
+                  class="form-control"
+                  placeholder=""
+                  required
+                />
+                <label for="registerPassword">Password</label>
+              </div>
+              <div class="input-group-text">
+                <span class="bi bi-lock-fill"></span>
+              </div>
+            </div>
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-8 d-inline-flex align-items-center">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value=""
+                    required
+                    id="flexCheckDefault"
+                  />
+                  <label class="form-check-label" for="flexCheckDefault">
+                    Şartları kabul ediyorum
+                  </label>
+                </div>
+              </div>
+              <!-- /.col -->
+              <div class="col-4">
+                <div class="d-grid gap-2">
+                  <button id="registerSubmitButton" type="submit" class="btn btn-primary">Kayıt Ol</button>
+                </div>
+              </div>
+              <!-- /.col -->
+            </div>
+            <!--end::Row-->
+          </form>
+
+          <p class="mb-0">
+            <a href="login-v2.html" class="link-primary text-center">
+              Zaten hesabım var
+            </a>
+          </p>
+        </div>
+        <!-- /.register-card-body -->
+      </div>
+    </div>
+    <!-- /.register-box -->
+
+    <Scripts path={path} />
+    <script is:inline>
+      const API_BASE_URL = "{API_BASE_URL}"
+      const AUTH_TOKEN_KEY = "adminlte_auth_token"
+      const AUTH_USER_NAME_KEY = "adminlte_user_name"
+      const AUTH_REGISTER_ENDPOINT = `${API_BASE_URL}/Auth/register`
+
+      const extractToken = (responseBody) => {
+        if (!responseBody || typeof responseBody !== "object") return null
+
+        return (
+          responseBody.token ||
+          responseBody.accessToken ||
+          responseBody.jwt ||
+          responseBody?.data?.token ||
+          responseBody?.data?.accessToken ||
+          responseBody?.result?.token ||
+          null
+        )
+      }
+
+      const getHomeUrl = () => new URL("../../index.html", globalThis.location.href).toString()
+
+      const getLoginUrl = () => new URL("login-v2.html", globalThis.location.href).toString()
+
+      const parseJsonResponse = async (response) => {
+        const responseText = await response.text()
+        if (!responseText) return null
+
+        try {
+          return JSON.parse(responseText)
+        } catch {
+          return { message: responseText }
+        }
+      }
+
+      const registerWithEndpoint = async (endpoint, payload) => {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        })
+
+        const parsedBody = await parseJsonResponse(response)
+        return { response, parsedBody }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("registerForm")
+        const firstNameInput = document.getElementById("registerFirstName")
+        const lastNameInput = document.getElementById("registerLastName")
+        const emailInput = document.getElementById("registerEmail")
+        const passwordInput = document.getElementById("registerPassword")
+        const submitButton = document.getElementById("registerSubmitButton")
+        const termsCheckbox = document.getElementById("flexCheckDefault")
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault()
+
+          const firstName = firstNameInput.value.trim()
+          const lastName = lastNameInput.value.trim()
+          const email = emailInput.value.trim()
+          const password = passwordInput.value.trim()
+
+          if (!firstName || !lastName || !email || !password) {
+            showToast("Tüm alanlar zorunludur.", "error")
+            return
+          }
+
+          if (!termsCheckbox.checked) {
+            showToast("Devam etmek için şartları kabul etmelisin.", "error")
+            return
+          }
+
+          submitButton.disabled = true
+          submitButton.textContent = "Kayıt Oluyor..."
+
+          const payload = {
+            firstName,
+            lastName,
+            email,
+            password
+          }
+
+          try {
+            const { response, parsedBody } = await registerWithEndpoint(AUTH_REGISTER_ENDPOINT, payload)
+
+            if (!response.ok) {
+              throw new Error(parsedBody?.error || parsedBody?.message || "Kayıt işlemi başarısız.")
+            }
+
+            const token = extractToken(parsedBody)
+            if (token) {
+              const displayName = `${firstName} ${lastName}`.trim()
+              localStorage.setItem(AUTH_TOKEN_KEY, token)
+              if (displayName) {
+                localStorage.setItem(AUTH_USER_NAME_KEY, displayName)
+              }
+              showToast("Kayıt başarılı. Giriş yapıldı.", "success")
+              setTimeout(() => {
+                globalThis.location.replace(getHomeUrl())
+              }, 900)
+              return
+            }
+
+            showToast("Kayıt başarılı. Giriş sayfasına yönlendiriliyorsun.", "success")
+            setTimeout(() => {
+              globalThis.location.replace(getLoginUrl())
+            }, 900)
+          } catch (error) {
+            showToast(error.message || "Beklenmeyen bir hata oluştu.", "error")
+          } finally {
+            submitButton.disabled = false
+            submitButton.textContent = "Kayıt Ol"
+          }
+        })
+      })
+    </script>
+  </body><!--end::Body-->
+</html>
+

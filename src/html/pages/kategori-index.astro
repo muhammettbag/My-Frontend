@@ -1,0 +1,644 @@
+---
+import Head from "@components/_head.astro"
+import Footer from "@components/dashboard/_footer.astro"
+import Topbar from "@components/dashboard/_topbar.astro"
+import Sidenav from "@components/dashboard/_sidenav.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../utils/api-config.js"
+
+const title = "AdminLTE v4 | Kategoriler"
+const path = "../../dist"
+const mainPage = "dashboard"
+const page = "kategori-index"
+---
+
+<!doctype html>
+<html lang="tr">
+  <!--begin::Head-->
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+    <!--end::Toast Container-->
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+      <Topbar path={path} />
+      <Sidenav path={path} mainPage={mainPage} page={page} />
+      <!--begin::App Main-->
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Kategori</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="#">Kategori</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Kategori Ekle / Kategori Listesi
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div id="kategori-liste-view" class="card card-primary card-outline">
+              <div class="card-header d-flex align-items-center gap-2">
+                <h3 class="card-title mb-0">Kategori Listesi</h3>
+                <div class="d-flex gap-2">
+                  <button id="kategoriImportButton" type="button" class="btn btn-outline-info btn-sm notranslate" translate="no" onclick="kategoriExcelSec()">
+                    Excel Yükle
+                  </button>
+                  <button id="kategoriExportButton" type="button" class="btn btn-outline-success btn-sm notranslate" translate="no" onclick="kategorileriExcelIndir()">
+                    Excel İndir
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="kategoriFormuGoster()">
+                    Kategori Ekle
+                  </button>
+                </div>
+                <input id="kategoriImportFileInput" type="file" class="d-none" accept=".xlsx,.xls" />
+                <button id="kategoriRefreshButton" type="button" class="btn btn-outline-secondary btn-sm ms-auto" onclick="kategorileriYenile()">
+                  Yenile
+                </button>
+              </div>
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 80px;">#</th>
+                      <th>Adı</th>
+                      <th>Açıklama</th>
+                      <th style="width: 160px;">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kategoriTablosu">
+                    <tr>
+                      <td colspan="4" class="text-center">Yükleniyor...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex justify-content-center">
+                <nav aria-label="Kategori sayfalama">
+                  <ul id="kategoriPagination" class="pagination pagination-sm mb-0"></ul>
+                </nav>
+              </div>
+            </div>
+
+            <div id="kategori-form-view" class="card card-success card-outline" style="display: none;">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 id="kategoriFormBaslik" class="card-title mb-0">Kategori Ekle</h3>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="kategoriListesiGoster()">
+                  Listeye Dön
+                </button>
+              </div>
+              <form id="kategoriForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label for="kategoriName" class="form-label">Kategori Adı</label>
+                      <input id="kategoriName" name="name" type="text" class="form-control" placeholder="Kategori adını yazın" required />
+                    </div>
+                    <div class="col-12">
+                      <label for="kategoriDescription" class="form-label">Açıklama</label>
+                      <textarea id="kategoriDescription" name="description" class="form-control" rows="6" placeholder="Kategori açıklamasını yazın"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <button type="button" class="btn btn-secondary" onclick="kategoriListesiGoster()">Vazgeç</button>
+                  <button id="kategoriFormSubmitBtn" type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </main>
+      <!--end::App Main-->
+      <Footer />
+    </div>
+    <!--end::App Wrapper-->
+    <Scripts path={path} />
+
+    <script is:inline>
+      /* eslint-disable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this, unicorn/prefer-string-slice */
+      // TOAST & NOTIFICATION STYLES
+      const toastStyles = `
+        .toast-notification {
+          min-width: 350px;
+          padding: 16px 20px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast-notification.success {
+          background-color: #28a745;
+          color: white;
+          border-left: 4px solid #207535;
+        }
+        
+        .toast-notification.error {
+          background-color: #dc3545;
+          color: white;
+          border-left: 4px solid #a02830;
+        }
+        
+        .toast-notification-bar {
+          margin-top: 8px;
+          width: 100%;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        
+        .toast-notification-progress {
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          animation: progress 4s linear forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `;
+      
+      // Toast Styles Ekle
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = toastStyles;
+      document.head.appendChild(styleSheet);
+
+      // TOAST NOTIFICATION FUNCTION
+      const gosterToast = (mesaj, tip = 'success') => {
+        const container = document.getElementById('toast-container');
+        
+        const toastDiv = document.createElement('div');
+        toastDiv.className = `toast-notification ${tip}`;
+        
+        const messageSpan = document.createElement('div');
+        messageSpan.textContent = mesaj;
+        messageSpan.style.marginBottom = '8px';
+        
+        const barDiv = document.createElement('div');
+        barDiv.className = 'toast-notification-bar';
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'toast-notification-progress';
+        barDiv.appendChild(progressDiv);
+        
+        toastDiv.appendChild(messageSpan);
+        toastDiv.appendChild(barDiv);
+        container.appendChild(toastDiv);
+        
+        setTimeout(() => {
+          toastDiv.style.animation = 'slideOut 0.3s ease-out forwards';
+          setTimeout(() => {
+            toastDiv.remove();
+          }, 300);
+        }, 4000);
+      };
+
+      let aktifSayfa = 1;
+      let sayfaBoyutu = 10;
+      let toplamSayfa = 1;
+      let duzenlenecekKategoriId = null;
+      let sonYuklenenKategoriler = [];
+      const EXCEL_IMPORT_LABEL = 'Excel Yükle';
+      const EXCEL_EXPORT_LABEL = 'Excel İndir';
+
+      const formElement = document.getElementById('kategoriForm');
+      const formBaslikElement = document.getElementById('kategoriFormBaslik');
+      const formSubmitButtonElement = document.getElementById('kategoriFormSubmitBtn');
+      const nameInputElement = document.getElementById('kategoriName');
+      const descriptionInputElement = document.getElementById('kategoriDescription');
+      const importFileInputElement = document.getElementById('kategoriImportFileInput');
+      const importButtonElement = document.getElementById('kategoriImportButton');
+      const exportButtonElement = document.getElementById('kategoriExportButton');
+
+      const addEndpoint = `${API_BASE_URL}/Category/add`;
+      const updateEndpoint = `${API_BASE_URL}/Category/Update`;
+      const exportEndpoint = `${API_BASE_URL}/Category/ExportCategories`;
+      const importEndpoint = `${API_BASE_URL}/Category/Import`;
+
+      const excelButonEtiketleriniSifirla = () => {
+        if (importButtonElement) {
+          importButtonElement.textContent = EXCEL_IMPORT_LABEL;
+        }
+
+        if (exportButtonElement) {
+          exportButtonElement.textContent = EXCEL_EXPORT_LABEL;
+        }
+      };
+
+      const formuEkleModunaAl = () => {
+        duzenlenecekKategoriId = null;
+        if (formBaslikElement) {
+          formBaslikElement.textContent = 'Kategori Ekle';
+        }
+
+        if (formSubmitButtonElement) {
+          formSubmitButtonElement.textContent = 'Kaydet';
+          formSubmitButtonElement.classList.remove('btn-warning');
+          formSubmitButtonElement.classList.add('btn-success');
+        }
+      };
+
+      window.kategorileriExcelIndir = async function() {
+        const exportButton = exportButtonElement;
+
+        if (exportButton) {
+          exportButton.disabled = true;
+          exportButton.textContent = 'İndiriliyor...';
+        }
+
+        try {
+          const response = await fetch(exportEndpoint, {
+            method: 'GET'
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const blob = await response.blob();
+          if (!blob || blob.size === 0) {
+            throw new Error('Boş dosya döndü.');
+          }
+
+          const downloadUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = 'Kategoriler.xlsx';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(downloadUrl);
+
+          gosterToast('Kategoriler Excel olarak indirildi.', 'success');
+        } catch (error) {
+          console.error('Kategori Excel indirme hatası:', error);
+          gosterToast(`Excel indirilemedi: ${error.message}`, 'error');
+        } finally {
+          if (exportButton) {
+            exportButton.disabled = false;
+            exportButton.textContent = EXCEL_EXPORT_LABEL;
+          }
+        }
+      };
+
+      window.kategorileriYenile = function() {
+        kategorileriGetir(aktifSayfa);
+      };
+
+      window.kategoriExcelSec = function() {
+        if (!importFileInputElement) {
+          gosterToast('Dosya seçici bulunamadı.', 'error');
+          return;
+        }
+
+        importFileInputElement.click();
+      };
+
+      window.kategoriExcelYukle = async function(file) {
+        if (!file) {
+          gosterToast('Lütfen bir Excel dosyası seçin.', 'error');
+          return;
+        }
+
+        const fileName = (file.name || '').toLowerCase();
+        if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+          gosterToast('Sadece .xlsx veya .xls dosyası yükleyebilirsiniz.', 'error');
+          return;
+        }
+
+        if (importButtonElement) {
+          importButtonElement.disabled = true;
+          importButtonElement.textContent = 'Yükleniyor...';
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch(importEndpoint, {
+            method: 'POST',
+            body: formData
+          });
+
+          const responseText = await response.text();
+
+          if (!response.ok) {
+            throw new Error(responseText || `HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          gosterToast(responseText || 'Kategoriler başarıyla içeri aktarıldı.', 'success');
+          kategorileriYenile();
+        } catch (error) {
+          console.error('Kategori Excel içeri aktarma hatası:', error);
+          gosterToast(`Excel yüklenemedi: ${error.message}`, 'error');
+        } finally {
+          if (importButtonElement) {
+            importButtonElement.disabled = false;
+            importButtonElement.textContent = EXCEL_IMPORT_LABEL;
+          }
+
+          if (importFileInputElement) {
+            importFileInputElement.value = '';
+          }
+        }
+      };
+
+      if (importFileInputElement) {
+        importFileInputElement.addEventListener('change', (event) => {
+          const selectedFile = event.target?.files?.[0];
+          if (selectedFile) {
+            kategoriExcelYukle(selectedFile);
+          }
+        });
+      }
+
+      // 1. SAYFA AÇILIR AÇILMAZ ÇALIŞACAK KOD (Verileri getiren tetikleyici)
+      document.addEventListener("DOMContentLoaded", () => {
+          excelButonEtiketleriniSifirla();
+          kategorileriYenile(); // Sayfa yüklendiğinde hemen API'ye git
+      });
+
+      formElement.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const payload = {
+          name: nameInputElement.value.trim(),
+          description: descriptionInputElement.value.trim() || null
+        };
+
+        if (!payload.name) {
+          gosterToast('Kategori adı zorunludur.', 'error');
+          return;
+        }
+
+        const isUpdateMode = Boolean(duzenlenecekKategoriId);
+        const requestBody = isUpdateMode
+          ? { ...payload, id: duzenlenecekKategoriId }
+          : payload;
+
+        const requestUrl = isUpdateMode ? updateEndpoint : addEndpoint;
+        const requestMethod = isUpdateMode ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch(requestUrl, {
+            method: requestMethod,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const successMsg = isUpdateMode ? 'Kategori başarıyla güncellendi!' : 'Kategori başarıyla eklendi!';
+          gosterToast(successMsg, 'success');
+          formElement.reset();
+          formuEkleModunaAl();
+          kategoriListesiGoster();
+        } catch (error) {
+          console.error('Kategori kaydetme hatası:', error);
+          gosterToast(`Kategori kaydedilemedi: ${error.message}`, 'error');
+        }
+      });
+
+      // 2. GÖRÜNÜM DEĞİŞTİRİCİLER
+      window.kategoriFormuGoster = function() {
+          document.getElementById('kategori-liste-view').style.display = 'none';
+          document.getElementById('kategori-form-view').style.display = 'block';
+          document.getElementById('kategoriForm').reset();
+        formuEkleModunaAl();
+      };
+
+      window.kategoriListesiGoster = function() {
+          document.getElementById('kategori-form-view').style.display = 'none';
+          document.getElementById('kategori-liste-view').style.display = 'block';
+        formuEkleModunaAl();
+        kategorileriGetir(aktifSayfa);
+      };
+
+      window.kategoriDuzenle = function(kategoriId) {
+        const secilenKategori = sonYuklenenKategoriler.find((kategori) => {
+          const id = kategori?.id || kategori?.categoryId || kategori?.Id || kategori?.CategoryId;
+          return String(id) === String(kategoriId);
+        });
+
+        if (!secilenKategori) {
+          gosterToast('Düzenlenecek kategori bulunamadı.', 'error');
+          return;
+        }
+
+        duzenlenecekKategoriId = secilenKategori.id || secilenKategori.categoryId || secilenKategori.Id || secilenKategori.CategoryId;
+        nameInputElement.value = secilenKategori.name || secilenKategori.Name || '';
+        descriptionInputElement.value = secilenKategori.description || secilenKategori.Description || '';
+
+        if (formBaslikElement) {
+          formBaslikElement.textContent = 'Kategori Düzenle';
+        }
+
+        if (formSubmitButtonElement) {
+          formSubmitButtonElement.textContent = 'Güncelle';
+          formSubmitButtonElement.classList.remove('btn-success');
+          formSubmitButtonElement.classList.add('btn-warning');
+        }
+
+        document.getElementById('kategori-liste-view').style.display = 'none';
+        document.getElementById('kategori-form-view').style.display = 'block';
+      };
+
+      window.kategoriSil = async function(kategoriId) {
+        const onay = confirm('Bu kategoriyi silmek istediğinizden emin misiniz?');
+        if (!onay) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/Category/Delete/${kategoriId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          gosterToast('Kategori başarıyla silindi!', 'success');
+          kategorileriGetir(aktifSayfa);
+        } catch (error) {
+          console.error('Kategori silme hatası:', error);
+          gosterToast(`Kategori silinemedi: ${error.message}`, 'error');
+        }
+      };
+
+      window.sayfayaGit = function(sayfaNo) {
+        if (sayfaNo < 1 || sayfaNo > toplamSayfa) {
+          return;
+        }
+
+        aktifSayfa = sayfaNo;
+        kategorileriGetir(aktifSayfa);
+      };
+
+      const sayfalamaCiz = () => {
+        const pagination = document.getElementById('kategoriPagination');
+
+        if (!pagination || toplamSayfa <= 1) {
+          if (pagination) {
+            pagination.innerHTML = '';
+          }
+          return;
+        }
+
+        let html = '';
+        for (let i = 1; i <= toplamSayfa; i++) {
+          html += `
+            <li class="page-item ${i === aktifSayfa ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="sayfayaGit(${i}); return false;">${i}</a>
+            </li>
+          `;
+        }
+
+        pagination.innerHTML = html;
+      };
+
+      // 3. API'DEN VERİ ÇEKME MOTORU
+      window.kategorileriGetir = function(sayfaNo = aktifSayfa) {
+        aktifSayfa = sayfaNo;
+
+          const tablo = document.getElementById('kategoriTablosu');
+        const pagination = document.getElementById('kategoriPagination');
+          tablo.innerHTML = '<tr><td colspan="4" class="text-center">Yükleniyor...</td></tr>';
+        if (pagination) {
+          pagination.innerHTML = '';
+        }
+
+        const listEndpoints = [
+          `${API_BASE_URL}/Category/GetAll`
+        ];
+
+        const fetchFromEndpoint = async (endpoint) => {
+        const response = await fetch(`${endpoint}?page=${aktifSayfa}&pageSize=${sayfaBoyutu}`);
+
+          if (response.status === 404) {
+            return null;
+          }
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const responseText = await response.text();
+
+          if (!responseText) {
+            return [];
+          }
+
+          try {
+            return JSON.parse(responseText);
+          } catch {
+            throw new Error('API JSON döndürmedi. Yanıt formatını kontrol et.');
+          }
+        };
+
+        (async () => {
+          for (const endpoint of listEndpoints) {
+            const data = await fetchFromEndpoint(endpoint);
+            if (data !== null) {
+              return data;
+            }
+          }
+
+          throw new Error('HTTP 404: Uygun liste endpointi bulunamadı.');
+        })()
+          .then(data => {
+            tablo.innerHTML = '';
+
+            const liste = Array.isArray(data)
+              ? data
+              : (data?.items || data?.Items || []);
+
+            sayfaBoyutu = data?.pageSize || data?.PageSize || sayfaBoyutu;
+            aktifSayfa = data?.page || data?.Page || aktifSayfa;
+
+            const totalCount = data?.totalCount || data?.TotalCount || liste.length;
+            toplamSayfa = data?.totalPages || data?.TotalPages || Math.max(1, Math.ceil(totalCount / sayfaBoyutu));
+                  
+                  if (!liste || liste.length === 0) {
+                      tablo.innerHTML = '<tr><td colspan="4" class="text-center">Henüz kategori yok.</td></tr>';
+                sayfalamaCiz();
+                      return;
+                  }
+
+                  sonYuklenenKategoriler = liste;
+
+                  // Verileri tabloya döşe
+                  liste.forEach((kategori, index) => {
+                const satirNo = ((aktifSayfa - 1) * sayfaBoyutu) + index + 1;
+                const kategoriId = kategori.id || kategori.categoryId || kategori.Id || kategori.CategoryId || '';
+                const description = (kategori.description || kategori.Description || '').substring(0, 100);
+                      tablo.innerHTML += `
+                          <tr>
+                  <td>${satirNo}</td>
+                              <td>${kategori.name || ''}</td>
+                              <td>${description || '-'}</td>
+                              <td>
+                          <button class="btn btn-warning btn-sm" onclick="kategoriDuzenle('${kategoriId}')">Düzenle</button>
+                                  <button class="btn btn-danger btn-sm" onclick="kategoriSil('${kategoriId}')">Sil</button>
+                              </td>
+                          </tr>
+                      `;
+                  });
+
+              sayfalamaCiz();
+              })
+              .catch(error => {
+                  console.error("Hata:", error);
+              toplamSayfa = 1;
+                  tablo.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Kategori listesi alınamadı: ${error.message}</td></tr>`;
+              });
+      };
+      /* eslint-enable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this, unicorn/prefer-string-slice */
+    </script>
+  </body>
+  <!--end::Body-->
+</html>
+

@@ -1,0 +1,653 @@
+---
+import Head from "@components/_head.astro"
+import Footer from "@components/dashboard/_footer.astro"
+import Topbar from "@components/dashboard/_topbar.astro"
+import Sidenav from "@components/dashboard/_sidenav.astro"
+import Scripts from "@components/_scripts.astro"
+import { API_BASE_URL } from "../utils/api-config.js"
+
+const title = "AdminLTE v4 | Yazarlar"
+const path = "../../dist"
+const mainPage = "dashboard"
+const page = "yazar-index"
+---
+
+<!doctype html>
+<html lang="en">
+  <!--begin::Head-->
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+    <!--end::Toast Container-->
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+      <Topbar path={path} />
+      <Sidenav path={path} mainPage={mainPage} page={page} />
+      <!--begin::App Main-->
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Yazar</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="#">Yazar</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Yazar Ekle / Yazar Listesi
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div id="yazar-liste-view" class="card card-primary card-outline">
+              <div class="card-header d-flex align-items-center gap-2">
+                <h3 class="card-title mb-0">Yazar Listesi</h3>
+                <div class="d-flex gap-2">
+                  <button id="yazarImportButton" type="button" class="btn btn-outline-info btn-sm" onclick="yazarExcelSec()">
+                    Excel Yükle
+                  </button>
+                  <button id="yazarExportButton" type="button" class="btn btn-outline-success btn-sm" onclick="yazarlariExcelIndir()">
+                    Excel İndir
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="yazarFormuGoster()">
+                    Yazar Ekle
+                  </button>
+                </div>
+                <input id="yazarImportFileInput" type="file" class="d-none" accept=".xlsx,.xls" />
+                <button id="yazarRefreshButton" type="button" class="btn btn-outline-secondary btn-sm ms-auto" onclick="yazarlariYenile()">
+                  Yenile
+                </button>
+              </div>
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 80px;">#</th>
+                      <th>Adı</th>
+                      <th>Email</th>
+                      <th style="width: 160px;">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="yazarTablosu">
+                    <tr>
+                      <td colspan="4" class="text-center">Yükleniyor...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex justify-content-center">
+                <nav aria-label="Yazar sayfalama">
+                  <ul id="yazarPagination" class="pagination pagination-sm mb-0"></ul>
+                </nav>
+              </div>
+            </div>
+
+            <div id="yazar-form-view" class="card card-success card-outline" style="display: none;">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 id="yazarFormBaslik" class="card-title mb-0">Yazar Ekle</h3>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="yazarListesiGoster()">
+                  Listeye Dön
+                </button>
+              </div>
+              <form id="yazarForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <label for="yazarFirstName" class="form-label">Ad</label>
+                      <input id="yazarFirstName" name="firstName" type="text" class="form-control" placeholder="Yazarın adını yazın" required />
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="yazarLastName" class="form-label">Soyadı</label>
+                      <input id="yazarLastName" name="lastName" type="text" class="form-control" placeholder="Yazarın soyadını yazın" required />
+                    </div>
+                    <div class="col-12">
+                      <label for="yazarEmail" class="form-label">Email</label>
+                      <input id="yazarEmail" name="email" type="email" class="form-control" placeholder="email@example.com" required />
+                    </div>
+                    <div class="col-12">
+                      <label for="yazarBio" class="form-label">Biyografi</label>
+                      <textarea id="yazarBio" name="description" class="form-control" rows="6" placeholder="Yazarın biyografisini yazın"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <button type="button" class="btn btn-secondary" onclick="yazarListesiGoster()">Vazgeç</button>
+                  <button id="yazarFormSubmitBtn" type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </main>
+      <!--end::App Main-->
+      <Footer />
+    </div>
+    <!--end::App Wrapper-->
+    <Scripts path={path} />
+
+    <script is:inline>
+      /* eslint-disable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this */
+      // TOAST & NOTIFICATION STYLES
+      const toastStyles = `
+        .toast-notification {
+          min-width: 350px;
+          padding: 16px 20px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast-notification.success {
+          background-color: #28a745;
+          color: white;
+          border-left: 4px solid #207535;
+        }
+        
+        .toast-notification.error {
+          background-color: #dc3545;
+          color: white;
+          border-left: 4px solid #a02830;
+        }
+        
+        .toast-notification-bar {
+          margin-top: 8px;
+          width: 100%;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        
+        .toast-notification-progress {
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          animation: progress 4s linear forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `;
+      
+      // Toast Styles Ekle
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = toastStyles;
+      document.head.appendChild(styleSheet);
+
+      // TOAST NOTIFICATION FUNCTION
+      const gosterToast = (mesaj, tip = 'success') => {
+        const container = document.getElementById('toast-container');
+        
+        const toastDiv = document.createElement('div');
+        toastDiv.className = `toast-notification ${tip}`;
+        
+        const messageSpan = document.createElement('div');
+        messageSpan.textContent = mesaj;
+        messageSpan.style.marginBottom = '8px';
+        
+        const barDiv = document.createElement('div');
+        barDiv.className = 'toast-notification-bar';
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'toast-notification-progress';
+        barDiv.appendChild(progressDiv);
+        
+        toastDiv.appendChild(messageSpan);
+        toastDiv.appendChild(barDiv);
+        container.appendChild(toastDiv);
+        
+        setTimeout(() => {
+          toastDiv.style.animation = 'slideOut 0.3s ease-out forwards';
+          setTimeout(() => {
+            toastDiv.remove();
+          }, 300);
+        }, 4000);
+      };
+
+      let aktifSayfa = 1;
+      let sayfaBoyutu = 10;
+      let toplamSayfa = 1;
+      let duzenlenecekYazarId = null;
+      let sonYuklenenYazarlar = [];
+
+      const formElement = document.getElementById('yazarForm');
+      const formBaslikElement = document.getElementById('yazarFormBaslik');
+      const formSubmitButtonElement = document.getElementById('yazarFormSubmitBtn');
+      const firstNameInputElement = document.getElementById('yazarFirstName');
+      const lastNameInputElement = document.getElementById('yazarLastName');
+      const emailInputElement = document.getElementById('yazarEmail');
+      const bioInputElement = document.getElementById('yazarBio');
+      const importFileInputElement = document.getElementById('yazarImportFileInput');
+      const importButtonElement = document.getElementById('yazarImportButton');
+
+      const addEndpoint = `${API_BASE_URL}/Author/add`;
+      const updateEndpoint = `${API_BASE_URL}/Author/Update`;
+      const exportEndpoint = `${API_BASE_URL}/Author/ExportAuthors`;
+      const importEndpoint = `${API_BASE_URL}/Author/Import`;
+
+      const formuEkleModunaAl = () => {
+        duzenlenecekYazarId = null;
+        if (formBaslikElement) {
+          formBaslikElement.textContent = 'Yazar Ekle';
+        }
+
+        if (formSubmitButtonElement) {
+          formSubmitButtonElement.textContent = 'Kaydet';
+          formSubmitButtonElement.classList.remove('btn-warning');
+          formSubmitButtonElement.classList.add('btn-success');
+        }
+      };
+
+      window.yazarlariExcelIndir = async function() {
+        const exportButton = document.getElementById('yazarExportButton');
+
+        if (exportButton) {
+          exportButton.disabled = true;
+          exportButton.textContent = 'İndiriliyor...';
+        }
+
+        try {
+          const response = await fetch(exportEndpoint, {
+            method: 'GET'
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const blob = await response.blob();
+          if (!blob || blob.size === 0) {
+            throw new Error('Boş dosya döndü.');
+          }
+
+          const downloadUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = 'Yazarlar.xlsx';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(downloadUrl);
+
+          gosterToast('Yazarlar Excel olarak indirildi.', 'success');
+        } catch (error) {
+          console.error('Yazar Excel indirme hatası:', error);
+          gosterToast(`Excel indirilemedi: ${error.message}`, 'error');
+        } finally {
+          if (exportButton) {
+            exportButton.disabled = false;
+            exportButton.textContent = 'Excel İndir';
+          }
+        }
+      };
+
+      window.yazarlariYenile = function() {
+        yazarlariGetir(aktifSayfa);
+      };
+
+      window.yazarExcelSec = function() {
+        if (!importFileInputElement) {
+          gosterToast('Dosya seçici bulunamadı.', 'error');
+          return;
+        }
+
+        importFileInputElement.click();
+      };
+
+      window.yazarExcelYukle = async function(file) {
+        if (!file) {
+          gosterToast('Lütfen bir Excel dosyası seçin.', 'error');
+          return;
+        }
+
+        const fileName = (file.name || '').toLowerCase();
+        if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+          gosterToast('Sadece .xlsx veya .xls dosyası yükleyebilirsiniz.', 'error');
+          return;
+        }
+
+        if (importButtonElement) {
+          importButtonElement.disabled = true;
+          importButtonElement.textContent = 'Yükleniyor...';
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch(importEndpoint, {
+            method: 'POST',
+            body: formData
+          });
+
+          const responseText = await response.text();
+
+          if (!response.ok) {
+            throw new Error(responseText || `HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          gosterToast(responseText || 'Yazarlar başarıyla içeri aktarıldı.', 'success');
+          yazarlariYenile();
+        } catch (error) {
+          console.error('Yazar Excel içeri aktarma hatası:', error);
+          gosterToast(`Excel yüklenemedi: ${error.message}`, 'error');
+        } finally {
+          if (importButtonElement) {
+            importButtonElement.disabled = false;
+            importButtonElement.textContent = 'Excel Yükle';
+          }
+
+          if (importFileInputElement) {
+            importFileInputElement.value = '';
+          }
+        }
+      };
+
+      if (importFileInputElement) {
+        importFileInputElement.addEventListener('change', (event) => {
+          const selectedFile = event.target?.files?.[0];
+          if (selectedFile) {
+            yazarExcelYukle(selectedFile);
+          }
+        });
+      }
+
+      // 1. SAYFA AÇILIR AÇILMAZ ÇALIŞACAK KOD (Verileri getiren tetikleyici)
+      document.addEventListener("DOMContentLoaded", () => {
+          yazarlariYenile(); // Sayfa yüklendiğinde hemen API'ye git
+      });
+
+      formElement.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const payload = {
+          firstName: firstNameInputElement.value.trim(),
+          lastName: lastNameInputElement.value.trim(),
+          email: emailInputElement.value.trim(),
+          description: bioInputElement.value.trim() || null
+        };
+
+        if (!payload.firstName) {
+          gosterToast('Ad zorunludur.', 'error');
+          return;
+        }
+
+        if (!payload.lastName) {
+          gosterToast('Soyadı zorunludur.', 'error');
+          return;
+        }
+
+        if (!payload.email) {
+          gosterToast('Email zorunludur.', 'error');
+          return;
+        }
+
+        const isUpdateMode = Boolean(duzenlenecekYazarId);
+        const requestBody = isUpdateMode
+          ? { ...payload, id: duzenlenecekYazarId }
+          : payload;
+
+        const requestUrl = isUpdateMode ? updateEndpoint : addEndpoint;
+        const requestMethod = isUpdateMode ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch(requestUrl, {
+            method: requestMethod,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const successMsg = isUpdateMode ? 'Yazar başarıyla güncellendi!' : 'Yazar başarıyla eklendi!';
+          gosterToast(successMsg, 'success');
+          formElement.reset();
+          formuEkleModunaAl();
+          yazarListesiGoster();
+        } catch (error) {
+          console.error('Yazar kaydetme hatası:', error);
+          gosterToast(`Yazar kaydedilemedi: ${error.message}`, 'error');
+        }
+      });
+
+      // 2. GÖRÜNÜM DEĞİŞTİRİCİLER
+      window.yazarFormuGoster = function() {
+          document.getElementById('yazar-liste-view').style.display = 'none';
+          document.getElementById('yazar-form-view').style.display = 'block';
+          document.getElementById('yazarForm').reset();
+        formuEkleModunaAl();
+      };
+
+      window.yazarListesiGoster = function() {
+          document.getElementById('yazar-form-view').style.display = 'none';
+          document.getElementById('yazar-liste-view').style.display = 'block';
+        formuEkleModunaAl();
+        yazarlariGetir(aktifSayfa);
+      };
+
+      window.yazarDuzenle = function(yazarId) {
+        const secilenYazar = sonYuklenenYazarlar.find((yazar) => {
+          const id = yazar?.id || yazar?.authorId || yazar?.Id || yazar?.AuthorId;
+          return String(id) === String(yazarId);
+        });
+
+        if (!secilenYazar) {
+          gosterToast('Düzenlenecek yazar bulunamadı.', 'error');
+          return;
+        }
+
+        duzenlenecekYazarId = secilenYazar.id || secilenYazar.authorId || secilenYazar.Id || secilenYazar.AuthorId;
+        firstNameInputElement.value = secilenYazar.firstName || secilenYazar.FirstName || '';
+        lastNameInputElement.value = secilenYazar.lastName || secilenYazar.LastName || '';
+        emailInputElement.value = secilenYazar.email || secilenYazar.Email || '';
+        bioInputElement.value = secilenYazar.description || secilenYazar.Description || secilenYazar.bio || secilenYazar.Bio || '';
+
+        if (formBaslikElement) {
+          formBaslikElement.textContent = 'Yazar Düzenle';
+        }
+
+        if (formSubmitButtonElement) {
+          formSubmitButtonElement.textContent = 'Güncelle';
+          formSubmitButtonElement.classList.remove('btn-success');
+          formSubmitButtonElement.classList.add('btn-warning');
+        }
+
+        document.getElementById('yazar-liste-view').style.display = 'none';
+        document.getElementById('yazar-form-view').style.display = 'block';
+      };
+
+      window.yazarSil = async function(yazarId) {
+        const onay = confirm('Bu yazarı silmek istediğinizden emin misiniz?');
+        if (!onay) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/Author/Delete/${yazarId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          gosterToast('Yazar başarıyla silindi!', 'success');
+          yazarlariGetir(aktifSayfa);
+        } catch (error) {
+          console.error('Yazar silme hatası:', error);
+          gosterToast(`Yazar silinemedi: ${error.message}`, 'error');
+        }
+      };
+
+      window.sayfayaGit = function(sayfaNo) {
+        if (sayfaNo < 1 || sayfaNo > toplamSayfa) {
+          return;
+        }
+
+        aktifSayfa = sayfaNo;
+        yazarlariGetir(aktifSayfa);
+      };
+
+      const sayfalamaCiz = () => {
+        const pagination = document.getElementById('yazarPagination');
+
+        if (!pagination || toplamSayfa <= 1) {
+          if (pagination) {
+            pagination.innerHTML = '';
+          }
+          return;
+        }
+
+        let html = '';
+        for (let i = 1; i <= toplamSayfa; i++) {
+          html += `
+            <li class="page-item ${i === aktifSayfa ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="sayfayaGit(${i}); return false;">${i}</a>
+            </li>
+          `;
+        }
+
+        pagination.innerHTML = html;
+      };
+
+      // 3. API'DEN VERİ ÇEKME MOTORU
+      window.yazarlariGetir = function(sayfaNo = aktifSayfa) {
+        aktifSayfa = sayfaNo;
+
+          const tablo = document.getElementById('yazarTablosu');
+        const pagination = document.getElementById('yazarPagination');
+          tablo.innerHTML = '<tr><td colspan="4" class="text-center">Yükleniyor...</td></tr>';
+        if (pagination) {
+          pagination.innerHTML = '';
+        }
+
+        const listEndpoints = [
+          `${API_BASE_URL}/Author/GetAll`
+        ];
+
+        const fetchFromEndpoint = async (endpoint) => {
+        const response = await fetch(`${endpoint}?page=${aktifSayfa}&pageSize=${sayfaBoyutu}`);
+
+          if (response.status === 404) {
+            return null;
+          }
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const responseText = await response.text();
+
+          if (!responseText) {
+            return [];
+          }
+
+          try {
+            return JSON.parse(responseText);
+          } catch {
+            throw new Error('API JSON döndürmedi. Yanıt formatını kontrol et.');
+          }
+        };
+
+        (async () => {
+          for (const endpoint of listEndpoints) {
+            const data = await fetchFromEndpoint(endpoint);
+            if (data !== null) {
+              return data;
+            }
+          }
+
+          throw new Error('HTTP 404: Uygun liste endpointi bulunamadı.');
+        })()
+          .then(data => {
+            tablo.innerHTML = '';
+
+            const liste = Array.isArray(data)
+              ? data
+              : (data?.items || data?.Items || []);
+
+            sayfaBoyutu = data?.pageSize || data?.PageSize || sayfaBoyutu;
+            aktifSayfa = data?.page || data?.Page || aktifSayfa;
+
+            const totalCount = data?.totalCount || data?.TotalCount || liste.length;
+            toplamSayfa = data?.totalPages || data?.TotalPages || Math.max(1, Math.ceil(totalCount / sayfaBoyutu));
+                  
+                  if (!liste || liste.length === 0) {
+                      tablo.innerHTML = '<tr><td colspan="4" class="text-center">Henüz yazar yok.</td></tr>';
+                sayfalamaCiz();
+                      return;
+                  }
+
+                  sonYuklenenYazarlar = liste;
+
+                  // Verileri tabloya döşe
+                  liste.forEach((yazar, index) => {
+                const satirNo = ((aktifSayfa - 1) * sayfaBoyutu) + index + 1;
+                const yazarId = yazar.id || yazar.authorId || yazar.Id || yazar.AuthorId || '';
+                      tablo.innerHTML += `
+                          <tr>
+                  <td>${satirNo}</td>
+                              <td>${yazar.firstName || ''} ${yazar.lastName || ''}</td>
+                              <td>${yazar.email || '-'}</td>
+                              <td>
+                          <button class="btn btn-warning btn-sm" onclick="yazarDuzenle('${yazarId}')">Düzenle</button>
+                                  <button class="btn btn-danger btn-sm" onclick="yazarSil('${yazarId}')">Sil</button>
+                              </td>
+                          </tr>
+                      `;
+                  });
+
+              sayfalamaCiz();
+              })
+              .catch(error => {
+                  console.error("Hata:", error);
+              toplamSayfa = 1;
+                  tablo.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Yazar listesi alınamadı: ${error.message}</td></tr>`;
+              });
+      };
+      /* eslint-enable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this */
+    </script>
+  </body>
+  <!--end::Body-->
+</html>
+

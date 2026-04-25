@@ -1,0 +1,251 @@
+---
+import Head from "@components/_head.astro"
+import Footer from "@components/dashboard/_footer.astro"
+import Topbar from "@components/dashboard/_topbar.astro"
+import Sidenav from "@components/dashboard/_sidenav.astro"
+import Scripts from "@components/_scripts.astro"
+
+const title = "AdminLTE v4 | Şifre Güncelle"
+const path = "../../../dist"
+const mainPage = "dashboard"
+const page = "sifre-guncelle"
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <Head title={title} path={path} />
+  </head>
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+    <div class="app-wrapper">
+      <Topbar path={path} />
+      <Sidenav path={path} mainPage={mainPage} page={page} />
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Şifre Güncelle</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="#">Sistem Yönetimi</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Şifre Güncelle</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="row justify-content-center">
+              <div class="col-12 col-lg-8 col-xl-6">
+                <div class="card card-primary card-outline">
+                  <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title mb-0">Şifre Güncelleme Ekranı</h3>
+                    <span class="badge text-bg-primary">Güvenlik</span>
+                  </div>
+                  <form id="sifreGuncelleForm" novalidate>
+                    <div class="card-body">
+                      <div class="alert alert-info mb-4" role="alert">
+                        Yeni şifreyi iki kez girerek doğrulama yapın. Eski şifreyi de kontrol ederek işlemi tamamlayın.
+                      </div>
+
+                      <div class="row g-3">
+                        <div class="col-12">
+                          <label for="eskiSifre" class="form-label">Eski Şifre</label>
+                          <div class="input-group">
+                            <input id="eskiSifre" name="oldPassword" type="password" class="form-control" placeholder="Eski şifrenizi girin" required />
+                            <button class="btn btn-outline-secondary" type="button" data-toggle-password="eskiSifre" aria-label="Eski şifreyi göster/gizle">
+                              <i class="bi bi-eye"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <label for="yeniSifre" class="form-label">Yeni Şifre</label>
+                          <div class="input-group">
+                            <input id="yeniSifre" name="newPassword" type="password" class="form-control" placeholder="Yeni şifrenizi girin" required />
+                            <button class="btn btn-outline-secondary" type="button" data-toggle-password="yeniSifre" aria-label="Yeni şifreyi göster/gizle">
+                              <i class="bi bi-eye"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <label for="yeniSifreTekrar" class="form-label">Yeni Şifre Tekrar</label>
+                          <div class="input-group">
+                            <input id="yeniSifreTekrar" name="confirmNewPassword" type="password" class="form-control" placeholder="Yeni şifrenizi tekrar girin" required />
+                            <button class="btn btn-outline-secondary" type="button" data-toggle-password="yeniSifreTekrar" aria-label="Yeni şifre tekrarını göster/gizle">
+                              <i class="bi bi-eye"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <div class="form-text">
+                            En az 6 karakter kullanmanız önerilir.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer d-flex gap-2 justify-content-end">
+                      <button type="reset" class="btn btn-secondary">Temizle</button>
+                      <button type="submit" class="btn btn-primary">Şifreyi Güncelle</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+    <script is:inline>
+      const toastStyles = `
+        .toast-notification {
+          min-width: 350px;
+          padding: 16px 20px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+
+        .toast-notification.success {
+          background-color: #28a745;
+          color: white;
+          border-left: 4px solid #207535;
+        }
+
+        .toast-notification.error {
+          background-color: #dc3545;
+          color: white;
+          border-left: 4px solid #a02830;
+        }
+
+        .toast-notification-bar {
+          margin-top: 8px;
+          width: 100%;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+
+        .toast-notification-progress {
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          animation: progress 4s linear forwards;
+        }
+
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `
+
+      const styleSheet = document.createElement("style")
+      styleSheet.textContent = toastStyles
+      document.head.append(styleSheet)
+
+      const gosterToast = (mesaj, tip = "success") => {
+        const container = document.getElementById("toast-container")
+
+        const toastDiv = document.createElement("div")
+        toastDiv.className = `toast-notification ${tip}`
+
+        const messageSpan = document.createElement("div")
+        messageSpan.textContent = mesaj
+        messageSpan.style.marginBottom = "8px"
+
+        const barDiv = document.createElement("div")
+        barDiv.className = "toast-notification-bar"
+
+        const progressDiv = document.createElement("div")
+        progressDiv.className = "toast-notification-progress"
+        barDiv.append(progressDiv)
+
+        toastDiv.append(messageSpan)
+        toastDiv.append(barDiv)
+        container.append(toastDiv)
+
+        setTimeout(() => {
+          toastDiv.style.animation = "slideOut 0.3s ease-out forwards"
+          setTimeout(() => {
+            toastDiv.remove()
+          }, 300)
+        }, 4000)
+      }
+
+      const form = document.getElementById("sifreGuncelleForm")
+      const eskiSifreInput = document.getElementById("eskiSifre")
+      const yeniSifreInput = document.getElementById("yeniSifre")
+      const yeniSifreTekrarInput = document.getElementById("yeniSifreTekrar")
+
+      document.querySelectorAll("[data-toggle-password]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const inputId = button.getAttribute("data-toggle-password")
+          const input = document.getElementById(inputId)
+          const icon = button.querySelector("i")
+
+          if (!input || !icon) {
+            return
+          }
+
+          const isPassword = input.type === "password"
+          input.type = isPassword ? "text" : "password"
+          icon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye"
+        })
+      })
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault()
+
+        const eskiSifre = eskiSifreInput.value.trim()
+        const yeniSifre = yeniSifreInput.value.trim()
+        const yeniSifreTekrar = yeniSifreTekrarInput.value.trim()
+
+        if (!eskiSifre || !yeniSifre || !yeniSifreTekrar) {
+          gosterToast("Tüm şifre alanları zorunludur.", "error")
+          return
+        }
+
+        if (yeniSifre.length < 6) {
+          gosterToast("Yeni şifre en az 6 karakter olmalıdır.", "error")
+          return
+        }
+
+        if (eskiSifre === yeniSifre) {
+          gosterToast("Yeni şifre eski şifre ile aynı olamaz.", "error")
+          return
+        }
+
+        if (yeniSifre !== yeniSifreTekrar) {
+          gosterToast("Yeni şifreler birbiriyle eşleşmiyor.", "error")
+          return
+        }
+
+        gosterToast("Şifre değişikliği kontrol edildi. Kaydetme işlemi için backend bağlantısı eklenebilir.", "success")
+        form.reset()
+      })
+    </script>
+    <Scripts path={path} />
+  </body>
+</html>

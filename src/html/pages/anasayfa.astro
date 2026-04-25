@@ -1,0 +1,559 @@
+---
+import Head from "@components/_head.astro"
+import { API_BASE_URL } from "../utils/api-config.js"
+
+const title = "Makaleler | Ana Sayfa"
+const path = "../../dist"
+
+const pathname = Astro.url.pathname;
+const pathSegments = pathname.split('/').filter((segment) => segment !== '');
+const depth = pathSegments.length > 0 ? pathSegments.length - 1 : 0;
+const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <Head title={title} path={path} />
+    <style>
+      :root {
+        --home-bg: #f5f1e8;
+        --home-ink: #1f2937;
+        --home-muted: #6b7280;
+        --home-card: rgba(255, 255, 255, 0.82);
+        --home-card-border: rgba(15, 23, 42, 0.08);
+        --home-accent: #0f766e;
+        --home-accent-2: #b45309;
+        --home-surface: #ffffff;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at top left, rgba(245, 158, 11, 0.18), transparent 28%),
+          radial-gradient(circle at top right, rgba(15, 118, 110, 0.16), transparent 24%),
+          linear-gradient(180deg, #fffaf2 0%, var(--home-bg) 100%);
+        color: var(--home-ink);
+      }
+
+      .home-shell {
+        min-height: 100vh;
+      }
+
+      .home-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(18px);
+        background: rgba(255, 250, 242, 0.78);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+      }
+
+      .brand-mark {
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 0.9rem;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: linear-gradient(135deg, var(--home-accent), #2563eb);
+        box-shadow: 0 14px 30px rgba(15, 118, 110, 0.22);
+        font-weight: 700;
+      }
+
+      .hero {
+        padding: 4rem 0 2rem;
+      }
+
+      .hero-panel {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--home-card-border);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 242, 0.92));
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
+      }
+
+      .hero-panel::after {
+        content: "";
+        position: absolute;
+        inset: auto -8rem -8rem auto;
+        width: 16rem;
+        height: 16rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(180, 83, 9, 0.18), transparent 70%);
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.1);
+        color: var(--home-accent);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .section-card {
+        border: 1px solid var(--home-card-border);
+        background: var(--home-card);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+        backdrop-filter: blur(16px);
+      }
+
+      .article-card {
+        height: 100%;
+        border: 1px solid rgba(15, 23, 42, 0.07);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .article-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.11);
+      }
+
+      .article-item {
+        margin-bottom: 1.25rem;
+      }
+
+      .article-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .article-frame {
+        padding: 0.9rem;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-left: 6px solid rgba(15, 118, 110, 0.75);
+        border-radius: 1.35rem;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+      }
+
+      .article-divider {
+        height: 1px;
+        margin-top: 1rem;
+        background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.22), transparent);
+      }
+
+      .article-cover {
+        min-height: 10rem;
+        background:
+          linear-gradient(135deg, rgba(15, 118, 110, 0.82), rgba(180, 83, 9, 0.74)),
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.26), transparent 45%);
+        color: #fff;
+      }
+
+      .article-excerpt {
+        color: var(--home-muted);
+        padding: 1rem 1.1rem;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 1rem;
+        background: rgba(15, 23, 42, 0.02);
+        overflow: hidden;
+      }
+
+      .author-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.04);
+      }
+
+      .author-avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--home-accent), #2563eb);
+      }
+
+      .stagger-in {
+        opacity: 0;
+        transform: translateY(14px);
+        animation: staggerIn 420ms ease forwards;
+      }
+
+      @keyframes staggerIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .loading-skeleton {
+        min-height: 16rem;
+        border-radius: 1rem;
+        background: linear-gradient(90deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.1), rgba(15, 23, 42, 0.05));
+        background-size: 200% 100%;
+        animation: shimmer 1.2s infinite linear;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          padding-top: 2.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="home-shell">
+      <header class="home-topbar">
+        <div class="container py-3">
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="brand-mark">A</div>
+              <div>
+                <div class="fw-bold fs-5 lh-1">Ana Sayfa</div>
+                <div class="text-secondary small">Makaleler ve yazarlar</div>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href={deploymentPath + "index.html"} class="btn btn-outline-secondary btn-sm">Admin Paneli</a>
+              <a href={deploymentPath + "makale-ekle.html"} class="btn btn-dark btn-sm">Makale Ekle</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="container">
+            <div class="hero-panel rounded-5 p-4 p-lg-5">
+              <div class="row align-items-center g-4 position-relative">
+                <div class="col-lg-7">
+                  <span class="eyebrow mb-3">
+                    <i class="bi bi-journal-text"></i>
+                    Yayınlanan içerikler
+                  </span>
+                  <h1 class="display-5 fw-bold mb-3">Makaleler, yazarları ve kısa içerik özetleri tek yerde.</h1>
+                  <p class="lead text-secondary mb-4">
+                    Bu sayfa admin ekranı değildir. Makaleleri kartlar halinde gösterir, her kartta başlık, yazar ve içerik özeti görünür.
+                  </p>
+                  <div class="d-flex flex-wrap gap-2">
+                    <button id="yenileButton" type="button" class="btn btn-primary btn-lg" onclick="verileriYenile()">Makaleleri Yenile</button>
+                    <a href={deploymentPath + "yazar-index.html"} class="btn btn-outline-dark btn-lg">Yazarlar</a>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="section-card rounded-4 p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <div class="text-secondary small">Toplam Makale</div>
+                        <div id="articleCount" class="fs-1 fw-bold">-</div>
+                      </div>
+                      <span class="badge text-bg-success">Canlı veri</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <div class="text-secondary small">Toplam Yazar</div>
+                        <div id="authorCount" class="fs-3 fw-semibold">-</div>
+                      </div>
+                      <span class="badge text-bg-warning">Ön yüz</span>
+                    </div>
+                    <div class="small text-secondary">
+                      Yüklenen içerikler API’den alınır. Her kartta başlık, yazar adı ve içerik özetini görebilirsiniz.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="pb-5">
+          <div class="container">
+            <div class="row g-4">
+              <div class="col-lg-8">
+                <div class="section-card rounded-4 p-4 mb-4">
+                  <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                    <div>
+                      <h2 class="h4 mb-1">Makaleler</h2>
+                      <p class="text-secondary mb-0">Başlık, yazar ve içerik bölüm bölüm listelenir.</p>
+                    </div>
+                    <span id="statusBadge" class="badge text-bg-secondary">Yükleniyor...</span>
+                  </div>
+
+                  <div id="articleGrid" class="article-stack">
+                    <div>
+                      <div class="loading-skeleton"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4">
+                <div class="section-card rounded-4 p-4 mb-4">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h5 mb-0">Yazarlar</h2>
+                    <span class="badge text-bg-info">Liste</span>
+                  </div>
+                  <div id="authorList" class="d-grid gap-3">
+                    <div class="text-secondary">Yazarlar yükleniyor...</div>
+                  </div>
+                </div>
+
+                <div class="section-card rounded-4 p-4">
+                  <h2 class="h5 mb-3">Kullanım</h2>
+                  <p class="text-secondary mb-0">
+                    Makaleler ve yazarlar admin panelden yönetilir. Bu sayfa ise ziyaretçi görünümü için kart tabanlı bir özet sunar.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script is:inline>
+      const articleGrid = document.getElementById('articleGrid');
+      const authorListElement = document.getElementById('authorList');
+      const articleCountElement = document.getElementById('articleCount');
+      const authorCountElement = document.getElementById('authorCount');
+      const statusBadgeElement = document.getElementById('statusBadge');
+      const refreshButton = document.getElementById('yenileButton');
+
+      let articleCache = [];
+      let authorCache = [];
+
+      const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+
+      const toArray = (data) => {
+        if (Array.isArray(data)) return data;
+        if (data?.data && Array.isArray(data.data)) return data.data;
+        if (data?.items && Array.isArray(data.items)) return data.items;
+        if (data?.Items && Array.isArray(data.Items)) return data.Items;
+        if (data?.$values && Array.isArray(data.$values)) return data.$values;
+        return [];
+      };
+
+      const getId = (item) => item?.id || item?.articleId || item?.authorId || item?.Id || item?.ArticleId || item?.AuthorId || '';
+
+      const getAuthorDisplayName = (author) => {
+        if (!author) return 'Bilinmeyen yazar';
+        const firstName = author.firstName || author.FirstName || '';
+        const lastName = author.lastName || author.LastName || '';
+        const fullName = author.fullName || author.FullName || author.name || author.Name || '';
+        const combined = `${firstName} ${lastName}`.trim();
+        return combined || fullName || 'Bilinmeyen yazar';
+      };
+
+      const getArticleTitle = (article) => article?.title || article?.Title || 'Başlıksız makale';
+      const getArticleContent = (article) => article?.content || article?.Content || '';
+      const getArticleBadge = (article) => article?.badge || article?.Badge || article?.categoryName || article?.CategoryName || '';
+      const getArticleAuthorId = (article) => article?.authorId || article?.AuthorId || article?.authorID || article?.AuthorID || '';
+
+      const buildAuthorMap = (authors) => {
+        const map = new Map();
+        authors.forEach((author) => {
+          map.set(String(getId(author)), getAuthorDisplayName(author));
+        });
+        return map;
+      };
+
+      const getAuthorNameForArticle = (article, authorMap) => {
+        const nestedAuthor = article?.author || article?.Author;
+        if (nestedAuthor) return getAuthorDisplayName(nestedAuthor);
+
+        const authorId = String(getArticleAuthorId(article));
+        if (authorId && authorMap.has(authorId)) return authorMap.get(authorId);
+
+        return article?.authorName || article?.AuthorName || article?.yazar || article?.Yazar || 'Bilinmeyen yazar';
+      };
+
+      const getInitials = (name) => {
+        const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+        if (parts.length === 0) return '?';
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+      };
+
+      const excerpt = (content) => {
+        const plainText = String(content || '').replace(/\s+/g, ' ').trim();
+        if (!plainText) return 'Bu makale için içerik özeti bulunmuyor.';
+        return plainText.length > 240 ? `${plainText.slice(0, 240)}...` : plainText;
+      };
+
+      const renderAuthors = (authors) => {
+        if (!authorListElement) return;
+
+        if (authors.length === 0) {
+          authorListElement.innerHTML = '<div class="text-secondary">Yazar bulunamadı.</div>';
+          return;
+        }
+
+        authorListElement.innerHTML = authors.slice(0, 6).map((author) => {
+          const name = getAuthorDisplayName(author);
+          const description = author?.description || author?.Description || author?.bio || author?.Bio || 'Biyografi eklenmemiş.';
+          return `
+            <div class="author-pill">
+              <div class="author-avatar">${escapeHtml(getInitials(name))}</div>
+              <div>
+                <div class="fw-semibold">${escapeHtml(name)}</div>
+                <div class="text-secondary small">${escapeHtml(description)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      const renderArticles = (articles, authors) => {
+        if (!articleGrid) return;
+
+        const authorMap = buildAuthorMap(authors);
+        if (articles.length === 0) {
+          articleGrid.innerHTML = `
+            <div class="col-12">
+              <div class="alert alert-light border mb-0">
+                Henüz makale bulunmuyor.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        articleGrid.innerHTML = articles.map((article, index) => {
+          const titleText = getArticleTitle(article);
+          const contentText = getArticleContent(article);
+          const badgeText = getArticleBadge(article);
+          const authorName = getAuthorNameForArticle(article, authorMap);
+          const itemDelay = Math.min(index * 70, 420);
+
+          return `
+            <div class="article-item stagger-in" style="animation-delay: ${itemDelay}ms;">
+              <div class="article-frame">
+                <article class="article-card rounded-4 overflow-hidden">
+                  <div class="article-cover p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                      <span class="badge text-bg-light text-dark">${escapeHtml(badgeText || 'Makale')}</span>
+                      <span class="small opacity-75">${escapeHtml(getArticleAuthorId(article) || '')}</span>
+                    </div>
+                    <div>
+                      <h3 class="h4 fw-bold mb-2">${escapeHtml(titleText)}</h3>
+                      <div class="d-flex align-items-center gap-2 small opacity-90">
+                        <i class="bi bi-person-circle"></i>
+                        <span>${escapeHtml(authorName)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-4">
+                    <p class="article-excerpt mb-4">${escapeHtml(excerpt(contentText))}</p>
+                    <div class="d-flex flex-wrap gap-2">
+                      <span class="badge text-bg-success">Başlık</span>
+                      <span class="badge text-bg-secondary">Yazar</span>
+                      <span class="badge text-bg-warning">İçerik</span>
+                    </div>
+                  </div>
+                </article>
+                <div class="article-divider" aria-hidden="true"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      const API_BASE_URL = "{API_BASE_URL}";
+      const loadJson = async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      };
+
+      const loadPageData = async () => {
+        if (statusBadgeElement) {
+          statusBadgeElement.className = 'badge text-bg-secondary';
+          statusBadgeElement.textContent = 'Yükleniyor...';
+        }
+
+        try {
+          const [articleData, authorData] = await Promise.all([
+            loadJson(`${API_BASE_URL}/Article/GetAll`),
+            loadJson(`${API_BASE_URL}/Author/GetAll`)
+          ]);
+
+          articleCache = toArray(articleData);
+          authorCache = toArray(authorData);
+
+          if (articleCountElement) {
+            articleCountElement.textContent = String(articleCache.length);
+          }
+
+          if (authorCountElement) {
+            authorCountElement.textContent = String(authorCache.length);
+          }
+
+          renderArticles(articleCache, authorCache);
+          renderAuthors(authorCache);
+
+          if (statusBadgeElement) {
+            statusBadgeElement.className = 'badge text-bg-success';
+            statusBadgeElement.textContent = 'Yüklendi';
+          }
+        } catch (error) {
+          console.error('Ana sayfa verileri yüklenemedi:', error);
+          if (statusBadgeElement) {
+            statusBadgeElement.className = 'badge text-bg-danger';
+            statusBadgeElement.textContent = 'Yüklenemedi';
+          }
+          if (articleGrid) {
+            articleGrid.innerHTML = `
+              <div class="col-12">
+                <div class="alert alert-danger mb-0">
+                  Makale verileri yüklenemedi: ${escapeHtml(error.message)}
+                </div>
+              </div>
+            `;
+          }
+          if (authorListElement) {
+            authorListElement.innerHTML = '<div class="text-secondary">Yazarlar yüklenemedi.</div>';
+          }
+        }
+      };
+
+      window.verileriYenile = async function() {
+        if (refreshButton) {
+          refreshButton.disabled = true;
+          refreshButton.textContent = 'Yenileniyor...';
+        }
+
+        await loadPageData();
+
+        if (refreshButton) {
+          refreshButton.disabled = false;
+          refreshButton.textContent = 'Makaleleri Yenile';
+        }
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        loadPageData();
+      });
+    </script>
+  </body>
+</html>
