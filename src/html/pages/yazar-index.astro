@@ -387,8 +387,50 @@ const page = "yazar-index"
           yazarlariYenile(); // Sayfa yüklendiğinde hemen API'ye git
       });
 
+      // Hata mesajlarını temizle
+      const temizleHatalar = () => {
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+      };
+
+      // Hata göster
+      const hataGoster = (elementId, mesaj) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.classList.add('is-invalid');
+          const feedback = document.createElement('div');
+          feedback.className = 'invalid-feedback';
+          feedback.textContent = mesaj;
+          element.parentNode.appendChild(feedback);
+        }
+      };
+
+      // Backend hata mesajlarını parse et
+      const parseBackendHata = (responseText) => {
+        try {
+          const errorObj = JSON.parse(responseText);
+          if (errorObj.errors) {
+            let mesajlar = [];
+            for (const key in errorObj.errors) {
+              const fieldErrors = errorObj.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                mesajlar.push(...fieldErrors);
+                // Field bazlı işaretleme
+                const id = `yazar${key}`;
+                hataGoster(id, fieldErrors[0]);
+              }
+            }
+            return mesajlar.join('\n');
+          }
+          return errorObj.title || responseText;
+        } catch (e) {
+          return responseText;
+        }
+      };
+
       formElement.addEventListener('submit', async (event) => {
         event.preventDefault();
+        temizleHatalar();
 
         const payload = {
           firstName: firstNameInputElement.value.trim(),
@@ -397,18 +439,22 @@ const page = "yazar-index"
           description: bioInputElement.value.trim() || null
         };
 
+        let hasError = false;
         if (!payload.firstName) {
-          gosterToast('Ad zorunludur.', 'error');
-          return;
+          hataGoster('yazarFirstName', 'Ad zorunludur.');
+          hasError = true;
         }
-
         if (!payload.lastName) {
-          gosterToast('Soyadı zorunludur.', 'error');
-          return;
+          hataGoster('yazarLastName', 'Soyadı zorunludur.');
+          hasError = true;
+        }
+        if (!payload.email) {
+          hataGoster('yazarEmail', 'Email zorunludur.');
+          hasError = true;
         }
 
-        if (!payload.email) {
-          gosterToast('Email zorunludur.', 'error');
+        if (hasError) {
+          gosterToast('Lütfen zorunlu alanları doldurun.', 'error');
           return;
         }
 
@@ -431,7 +477,8 @@ const page = "yazar-index"
 
           if (!response.ok) {
             const responseText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+            const hataMesaji = parseBackendHata(responseText);
+            throw new Error(hataMesaji);
           }
 
           const successMsg = isUpdateMode ? 'Yazar başarıyla güncellendi!' : 'Yazar başarıyla eklendi!';

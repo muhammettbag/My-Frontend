@@ -174,16 +174,68 @@ const htmlPath = convertPathToHtml(path)
       const apiUrl = `${API_BASE_URL}/Category/add`;
       const form = document.getElementById("kategoriForm");
 
+      // Hata mesajlarını temizle
+      const temizleHatalar = () => {
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+      };
+
+      // Hata göster
+      const hataGoster = (elementId, mesaj) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.classList.add('is-invalid');
+          const feedback = document.createElement('div');
+          feedback.className = 'invalid-feedback';
+          feedback.textContent = mesaj;
+          element.parentNode.appendChild(feedback);
+        }
+      };
+
+      // Backend hata mesajlarını parse et
+      const parseBackendHata = (responseText) => {
+        try {
+          const errorObj = JSON.parse(responseText);
+          if (errorObj.errors) {
+            let mesajlar = [];
+            for (const key in errorObj.errors) {
+              const fieldErrors = errorObj.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                mesajlar.push(...fieldErrors);
+                // Field bazlı işaretleme
+                const id = `kategori${key}`;
+                hataGoster(id, fieldErrors[0]);
+              }
+            }
+            return mesajlar.join('\n');
+          }
+          return errorObj.title || responseText;
+        } catch (e) {
+          return responseText;
+        }
+      };
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        temizleHatalar();
+
+        const nameInput = document.getElementById("kategoriName");
+        const descriptionInput = document.getElementById("kategoriDescription");
 
         const payload = {
-          Name: document.getElementById("kategoriName").value.trim(),
-          Description: document.getElementById("kategoriDescription").value.trim() || null
+          Name: nameInput.value.trim(),
+          Description: descriptionInput.value.trim() || null
         };
 
-        if (!payload.name) {
-          gosterToast('Kategori adı zorunludur.', 'error');
+        let hasError = false;
+
+        if (!payload.Name) {
+          hataGoster("kategoriName", 'Kategori adı zorunludur.');
+          hasError = true;
+        }
+
+        if (hasError) {
+          gosterToast('Lütfen zorunlu alanları doldurun.', 'error');
           return;
         }
 
@@ -198,7 +250,8 @@ const htmlPath = convertPathToHtml(path)
 
           if (!response.ok) {
             const responseText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+            const hataMesaji = parseBackendHata(responseText);
+            throw new Error(hataMesaji);
           }
 
           gosterToast("Kategori başarıyla eklendi!", "success");

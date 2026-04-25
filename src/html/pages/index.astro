@@ -525,8 +525,50 @@ const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
         makaleleriYenile(); // Sayfa yüklendiğinde hemen API'ye git
     });
 
+    // Hata mesajlarını temizle
+    const temizleHatalar = () => {
+      document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+    };
+
+    // Hata göster
+    const hataGoster = (elementId, mesaj) => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.classList.add('is-invalid');
+        const feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        feedback.textContent = mesaj;
+        element.parentNode.appendChild(feedback);
+      }
+    };
+
+    // Backend hata mesajlarını parse et
+    const parseBackendHata = (responseText) => {
+      try {
+        const errorObj = JSON.parse(responseText);
+        if (errorObj.errors) {
+          let mesajlar = [];
+          for (const key in errorObj.errors) {
+            const fieldErrors = errorObj.errors[key];
+            if (Array.isArray(fieldErrors)) {
+              mesajlar.push(...fieldErrors);
+              // Field bazlı işaretleme
+              const id = `makale${key}`;
+              hataGoster(id, fieldErrors[0]);
+            }
+          }
+          return mesajlar.join('\n');
+        }
+        return errorObj.title || responseText;
+      } catch (e) {
+        return responseText;
+      }
+    };
+
     formElement.addEventListener('submit', async (event) => {
       event.preventDefault();
+      temizleHatalar();
 
       const payload = {
         title: titleInputElement.value.trim(),
@@ -537,23 +579,26 @@ const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
         authorId: authorIdSelectElement.value
       };
 
+      let hasError = false;
       if (!payload.title) {
-        gosterToast('Başlık zorunludur.', 'error');
-        return;
+        hataGoster('makaleTitle', 'Başlık zorunludur.');
+        hasError = true;
       }
-
       if (!payload.imageUrl) {
-        gosterToast('Görsel URL zorunludur.', 'error');
-        return;
+        hataGoster('makaleImageUrl', 'Görsel URL zorunludur.');
+        hasError = true;
       }
-
       if (!payload.categoryId) {
-        gosterToast('Kategori zorunludur.', 'error');
-        return;
+        hataGoster('makaleCategoryId', 'Kategori zorunludur.');
+        hasError = true;
+      }
+      if (!payload.authorId) {
+        hataGoster('makaleAuthorId', 'Yazar zorunludur.');
+        hasError = true;
       }
 
-      if (!payload.authorId) {
-        gosterToast('Yazar zorunludur.', 'error');
+      if (hasError) {
+        gosterToast('Lütfen zorunlu alanları doldurun.', 'error');
         return;
       }
 
@@ -576,7 +621,8 @@ const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
 
         if (!response.ok) {
           const responseText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          const hataMesaji = parseBackendHata(responseText);
+          throw new Error(hataMesaji);
         }
 
         const successMsg = isUpdateMode ? 'Makale başarıyla güncellendi!' : 'Makale başarıyla eklendi!';
