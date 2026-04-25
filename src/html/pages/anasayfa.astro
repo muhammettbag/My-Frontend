@@ -477,7 +477,6 @@ const deploymentPath = depth === 0 ? './' : '../'.repeat(depth);
         }).join('');
       };
 
-      const API_BASE_URL = "{API_BASE_URL}";
       const loadJson = async (url) => {
         const response = await fetch(url);
         if (!response.ok) {

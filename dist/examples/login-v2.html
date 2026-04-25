@@ -70,17 +70,32 @@
         </div>
         <div class="card-body login-card-body">
           <p class="login-box-msg">Sign in to start your session</p>
-          <form action="../index3.html" method="post">
+          <form id="loginForm" novalidate>
             <div class="input-group mb-1">
               <div class="form-floating">
-                <input id="loginEmail" type="email" class="form-control" value="" placeholder="" />
-                <label for="loginEmail">Email</label>
+                <input
+                  id="loginUsername"
+                  name="username"
+                  type="text"
+                  class="form-control"
+                  value=""
+                  placeholder=""
+                  required
+                />
+                <label for="loginUsername">Username</label>
               </div>
-              <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+              <div class="input-group-text"><span class="bi bi-person-badge"></span></div>
             </div>
             <div class="input-group mb-1">
               <div class="form-floating">
-                <input id="loginPassword" type="password" class="form-control" placeholder="" />
+                <input
+                  id="loginPassword"
+                  name="password"
+                  type="password"
+                  class="form-control"
+                  placeholder=""
+                  required
+                />
                 <label for="loginPassword">Password</label>
               </div>
               <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
@@ -96,7 +111,9 @@
               <!-- /.col -->
               <div class="col-4">
                 <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-primary">Sign In</button>
+                  <button id="loginSubmitButton" type="submit" class="btn btn-primary">
+                    Sign In
+                  </button>
                 </div>
               </div>
               <!-- /.col -->
@@ -115,7 +132,7 @@
           <!-- /.social-auth-links -->
           <p class="mb-1"><a href="forgot-password.html">I forgot my password</a></p>
           <p class="mb-0">
-            <a href="register.html" class="text-center"> Register a new membership </a>
+            <a href="register-v2.html" class="btn btn-outline-secondary w-100"> Kayıt Ol </a>
           </p>
         </div>
         <!-- /.login-card-body -->
@@ -141,26 +158,569 @@
     <script src="../js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
-            },
-          });
-        }
-      });
+      (function () {
+        const deploymentPath = '../';
+        const API_BASE_URL = 'http://testmb.runasp.net/api';
+
+        const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+        const Default = {
+          scrollbarTheme: 'os-theme-light',
+          scrollbarAutoHide: 'leave',
+          scrollbarClickScroll: true,
+        };
+
+        const AUTH_TOKEN_KEY = 'adminlte_auth_token';
+        const AUTH_USER_NAME_KEY = 'adminlte_user_name';
+        const PUBLIC_PAGE_PATTERN =
+          /\/examples\/(?:login(?:-v2)?|register(?:-v2)?)(?:\.html)?\/?$/i;
+        const TOAST_STYLE_ID = 'adminlte-toast-styles';
+        const TOAST_CONTAINER_ID = 'toast-container';
+
+        // Make API_BASE_URL globally available
+        globalThis.API_BASE_URL = API_BASE_URL;
+
+        const getRequestUrl = (input) => {
+          if (typeof input === 'string') return input;
+          if (input instanceof URL) return input.toString();
+          if (input && typeof input.url === 'string') return input.url;
+          return '';
+        };
+
+        const getToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+        const getStoredDisplayName = () => (localStorage.getItem(AUTH_USER_NAME_KEY) || '').trim();
+
+        const decodeJwtPayload = (token) => {
+          if (!token || typeof token !== 'string') return null;
+
+          const tokenParts = token.split('.');
+          if (tokenParts.length < 2) return null;
+
+          try {
+            const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+            const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+            const json = atob(paddedBase64);
+            return JSON.parse(json);
+          } catch {
+            return null;
+          }
+        };
+
+        const readClaimValue = (payload, claimKeys = []) => {
+          for (const key of claimKeys) {
+            const value = payload?.[key];
+            if (typeof value === 'string' && value.trim()) {
+              return value.trim();
+            }
+          }
+
+          return '';
+        };
+
+        const isLikelyEmail = (value) => /@/.test(value);
+
+        const isInvalidDisplayName = (value, payload = null) => {
+          const normalizedValue = (value || '').toString().trim().toLowerCase();
+          if (!normalizedValue) return true;
+          if (isLikelyEmail(normalizedValue)) return true;
+
+          if (payload) {
+            const usernameLikeClaims = ['unique_name', 'username', 'preferred_username', 'email'];
+
+            for (const claimKey of usernameLikeClaims) {
+              const claimValue = (payload?.[claimKey] || '').toString().trim().toLowerCase();
+              if (claimValue && claimValue === normalizedValue) {
+                return true;
+              }
+            }
+          }
+
+          return false;
+        };
+
+        const getUserIdFromToken = () => {
+          const token = getToken();
+          const payload = decodeJwtPayload(token);
+          if (!payload) return '';
+
+          return readClaimValue(payload, [
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
+            'nameid',
+            'userId',
+            'userid',
+            'id',
+            'sub',
+          ]);
+        };
+
+        const getNameFromPayload = (payload) => {
+          if (!payload || typeof payload !== 'object') return '';
+
+          const source =
+            payload.user ||
+            payload.data?.user ||
+            payload.result?.user ||
+            payload.data ||
+            payload.result ||
+            payload;
+
+          const firstName = (
+            source.firstName ||
+            source.firstname ||
+            source.FirstName ||
+            payload.firstName ||
+            payload.firstname ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          const lastName = (
+            source.lastName ||
+            source.lastname ||
+            source.LastName ||
+            payload.lastName ||
+            payload.lastname ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          const fullName = (
+            source.fullName ||
+            source.fullname ||
+            source.FullName ||
+            source.name ||
+            payload.fullName ||
+            payload.fullname ||
+            payload.name ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+
+          return fullName;
+        };
+
+        const fetchDisplayNameFromUserApi = async () => {
+          const userId = getUserIdFromToken();
+
+          const endpoints = [
+            userId ? `${API_BASE_URL}/User/GetById/${userId}` : '',
+            userId ? `${API_BASE_URL}/User/${userId}` : '',
+            userId ? `${API_BASE_URL}/Users/${userId}` : '',
+            `${API_BASE_URL}/User/GetCurrentUser`,
+            `${API_BASE_URL}/Auth/me`,
+            `${API_BASE_URL}/Auth/profile`,
+          ].filter(Boolean);
+
+          for (const endpoint of endpoints) {
+            try {
+              const response = await fetch(endpoint, { method: 'GET' });
+              if (!response.ok) continue;
+
+              const responseText = await response.text();
+              if (!responseText) continue;
+
+              let parsedBody = null;
+              try {
+                parsedBody = JSON.parse(responseText);
+              } catch {
+                continue;
+              }
+
+              const displayName = getNameFromPayload(parsedBody);
+              if (displayName) {
+                localStorage.setItem(AUTH_USER_NAME_KEY, displayName);
+                return displayName;
+              }
+            } catch {
+              // Endpoint yoksa sıradakini dene.
+            }
+          }
+
+          return '';
+        };
+
+        const getDisplayNameFromToken = () => {
+          const token = getToken();
+          const payload = decodeJwtPayload(token);
+          const storedName = getStoredDisplayName();
+          if (storedName && !isInvalidDisplayName(storedName, payload)) {
+            return storedName;
+          }
+
+          if (storedName && isInvalidDisplayName(storedName, payload)) {
+            localStorage.removeItem(AUTH_USER_NAME_KEY);
+          }
+
+          if (!payload) return '';
+
+          const fullName = readClaimValue(payload, [
+            'name',
+            'fullName',
+            'fullname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
+          ]);
+
+          const firstName = readClaimValue(payload, [
+            'given_name',
+            'givenName',
+            'firstName',
+            'firstname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+          ]);
+
+          const lastName = readClaimValue(payload, [
+            'family_name',
+            'familyName',
+            'lastName',
+            'lastname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+          ]);
+
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+
+          if (fullName) return fullName;
+
+          return '';
+        };
+
+        const setTopbarUserInfo = (displayName) => {
+          if (!displayName) return;
+
+          const topbarName = document.getElementById('topbarUserName');
+          if (topbarName) {
+            topbarName.textContent = displayName;
+          }
+
+          const menuFullName = document.getElementById('userMenuFullName');
+          if (menuFullName) {
+            menuFullName.textContent = displayName;
+          }
+        };
+
+        const updateTopbarUserInfo = async () => {
+          const cachedOrTokenName = getDisplayNameFromToken();
+          if (cachedOrTokenName) {
+            setTopbarUserInfo(cachedOrTokenName);
+          }
+
+          const apiDisplayName = await fetchDisplayNameFromUserApi();
+          if (apiDisplayName) {
+            setTopbarUserInfo(apiDisplayName);
+          }
+        };
+
+        const ensureToastStyles = () => {
+          if (document.getElementById(TOAST_STYLE_ID)) return;
+
+          const style = document.createElement('style');
+          style.id = TOAST_STYLE_ID;
+          style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(24px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+  `;
+          document.head.append(style);
+        };
+
+        const ensureToastContainer = () => {
+          let container = document.getElementById(TOAST_CONTAINER_ID);
+
+          if (!container) {
+            container = document.createElement('div');
+            container.id = TOAST_CONTAINER_ID;
+            container.style.position = 'fixed';
+            container.style.top = '20px';
+            container.style.right = '20px';
+            container.style.zIndex = '9999';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '10px';
+            document.body.append(container);
+          }
+
+          return container;
+        };
+
+        const showToast = (message, type = 'success') => {
+          ensureToastStyles();
+          const container = ensureToastContainer();
+
+          const toast = document.createElement('div');
+          toast.style.minWidth = '320px';
+          toast.style.padding = '16px 20px';
+          toast.style.borderRadius = '6px';
+          toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+          toast.style.fontSize = '14px';
+          toast.style.fontWeight = '500';
+          toast.style.color = 'white';
+          toast.style.animation = 'slideIn 0.3s ease-out';
+          toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+
+          const messageDiv = document.createElement('div');
+          messageDiv.textContent = message;
+          messageDiv.style.marginBottom = '8px';
+
+          const bar = document.createElement('div');
+          bar.style.width = '100%';
+          bar.style.height = '3px';
+          bar.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+          bar.style.borderRadius = '2px';
+          bar.style.overflow = 'hidden';
+
+          const progress = document.createElement('div');
+          progress.style.width = '100%';
+          progress.style.height = '100%';
+          progress.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+          progress.style.animation = 'progress 4s linear forwards';
+
+          bar.append(progress);
+          toast.append(messageDiv, bar);
+          container.append(toast);
+
+          setTimeout(() => {
+            toast.remove();
+          }, 4000);
+        };
+
+        globalThis.showToast = showToast;
+
+        const resolveUrlFromCurrentPage = (relativePath) => {
+          return new URL(relativePath, globalThis.location.href).toString();
+        };
+
+        const getLoginUrl = () =>
+          resolveUrlFromCurrentPage(`${deploymentPath}examples/login-v2.html`);
+        const getHomeUrl = () => resolveUrlFromCurrentPage(`${deploymentPath}index.html`);
+
+        const clearAuthTokenAndRedirect = () => {
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+          localStorage.removeItem(AUTH_USER_NAME_KEY);
+          const target = getLoginUrl();
+          if (globalThis.location.href !== target) {
+            globalThis.location.replace(target);
+          }
+        };
+
+        const shouldProtectCurrentPage = () =>
+          !PUBLIC_PAGE_PATTERN.test(globalThis.location.pathname);
+
+        const shouldAttachAuthHeader = (requestUrl) => {
+          if (!requestUrl) return false;
+          return requestUrl.startsWith(API_BASE_URL);
+        };
+
+        const originalFetch = globalThis.fetch.bind(globalThis);
+        globalThis.fetch = async (input, init = {}) => {
+          const requestUrl = getRequestUrl(input);
+          const token = getToken();
+          const nextInit = { ...init };
+
+          if (token && shouldAttachAuthHeader(requestUrl)) {
+            const headers = new Headers(init?.headers || {});
+            if (!headers.has('Authorization')) {
+              headers.set('Authorization', `Bearer ${token}`);
+            }
+            nextInit.headers = headers;
+          }
+
+          const response = await originalFetch(input, nextInit);
+
+          if (response.status === 401 && shouldProtectCurrentPage()) {
+            clearAuthTokenAndRedirect();
+          }
+
+          return response;
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+          const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+          if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+              scrollbars: {
+                theme: Default.scrollbarTheme,
+                autoHide: Default.scrollbarAutoHide,
+                clickScroll: Default.scrollbarClickScroll,
+              },
+            });
+          }
+
+          if (shouldProtectCurrentPage() && !getToken()) {
+            clearAuthTokenAndRedirect();
+            return;
+          }
+
+          if (!shouldProtectCurrentPage() && getToken()) {
+            globalThis.location.replace(getHomeUrl());
+            return;
+          }
+
+          updateTopbarUserInfo();
+
+          const signOutButton = document.getElementById('signOutButton');
+          if (signOutButton) {
+            signOutButton.addEventListener('click', (event) => {
+              event.preventDefault();
+              clearAuthTokenAndRedirect();
+            });
+          }
+        });
+      })();
     </script>
     <!--end::OverlayScrollbars Configure-->
+    <script>
+      const AUTH_TOKEN_KEY = 'adminlte_auth_token';
+      const AUTH_USER_NAME_KEY = 'adminlte_user_name';
+      const AUTH_LOGIN_ENDPOINT = `${API_BASE_URL}/Auth/login`;
+
+      const extractToken = (responseBody) => {
+        if (!responseBody || typeof responseBody !== 'object') return null;
+
+        return (
+          responseBody.token ||
+          responseBody.accessToken ||
+          responseBody.jwt ||
+          responseBody?.data?.token ||
+          responseBody?.data?.accessToken ||
+          responseBody?.result?.token ||
+          null
+        );
+      };
+
+      const getHomeUrl = () => new URL('../../index.html', globalThis.location.href).toString();
+
+      const getDisplayNameFromResponse = (responseBody) => {
+        if (!responseBody || typeof responseBody !== 'object') {
+          return '';
+        }
+
+        const user =
+          responseBody.user ||
+          responseBody.data?.user ||
+          responseBody.result?.user ||
+          responseBody.data ||
+          responseBody.result ||
+          {};
+
+        const firstName = (
+          user.firstName ||
+          user.firstname ||
+          responseBody.firstName ||
+          responseBody.firstname ||
+          ''
+        )
+          .toString()
+          .trim();
+        const lastName = (
+          user.lastName ||
+          user.lastname ||
+          responseBody.lastName ||
+          responseBody.lastname ||
+          ''
+        )
+          .toString()
+          .trim();
+        const fullName = (
+          user.fullName ||
+          user.fullname ||
+          responseBody.fullName ||
+          responseBody.fullname ||
+          responseBody.name ||
+          ''
+        )
+          .toString()
+          .trim();
+
+        if (firstName || lastName) {
+          return `${firstName} ${lastName}`.trim();
+        }
+
+        return fullName;
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('loginUsername');
+        const passwordInput = document.getElementById('loginPassword');
+        const submitButton = document.getElementById('loginSubmitButton');
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const username = usernameInput.value.trim();
+          const password = passwordInput.value.trim();
+
+          if (!username || !password) {
+            showToast('Username ve sifre alanlari zorunludur.', 'error');
+            return;
+          }
+
+          submitButton.disabled = true;
+          submitButton.textContent = 'Signing In...';
+
+          try {
+            const response = await fetch(AUTH_LOGIN_ENDPOINT, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                username,
+                password,
+              }),
+            });
+
+            const responseText = await response.text();
+            let parsedBody = null;
+
+            if (responseText) {
+              try {
+                parsedBody = JSON.parse(responseText);
+              } catch {
+                parsedBody = { message: responseText };
+              }
+            }
+
+            if (!response.ok) {
+              const backendMessage = parsedBody?.message || parsedBody?.error || 'Giris basarisiz.';
+              throw new Error(backendMessage);
+            }
+
+            const token = extractToken(parsedBody);
+            if (!token) {
+              throw new Error('Token alinamadi. API donusunu kontrol edin.');
+            }
+
+            const displayName = getDisplayNameFromResponse(parsedBody);
+            localStorage.setItem(AUTH_TOKEN_KEY, token);
+            if (displayName) {
+              localStorage.setItem(AUTH_USER_NAME_KEY, displayName);
+            }
+            showToast('Giriş başarılı.', 'success');
+            setTimeout(() => {
+              globalThis.location.replace(getHomeUrl());
+            }, 900);
+          } catch (error) {
+            showToast(error.message || 'Beklenmeyen bir hata olustu.', 'error');
+          } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Sign In';
+          }
+        });
+      });
+    </script>
     <!--end::Script-->
   </body>
   <!--end::Body-->

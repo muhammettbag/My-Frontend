@@ -20,7 +20,7 @@ const adminlteJsUrl = deploymentPath + "js/adminlte.js";
 <script src={adminlteJsUrl} is:inline></script>
 <!--end::Required Plugin(AdminLTE)-->
 <!--begin::OverlayScrollbars Configure-->
-<script is:inline define:vars={{ deploymentPath }}>
+<script is:inline define:vars={{ deploymentPath, API_BASE_URL }}>
 const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper"
 const Default = {
   scrollbarTheme: "os-theme-light",
@@ -33,7 +33,9 @@ const AUTH_USER_NAME_KEY = "adminlte_user_name"
 const PUBLIC_PAGE_PATTERN = /\/examples\/(?:login(?:-v2)?|register(?:-v2)?)(?:\.html)?\/?$/i
 const TOAST_STYLE_ID = "adminlte-toast-styles"
 const TOAST_CONTAINER_ID = "toast-container"
-const API_BASE_URL = "{API_BASE_URL}"
+
+// Make API_BASE_URL globally available
+globalThis.API_BASE_URL = API_BASE_URL;
 
 const getRequestUrl = (input) => {
   if (typeof input === "string") return input

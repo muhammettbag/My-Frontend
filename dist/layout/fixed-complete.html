@@ -219,7 +219,7 @@
                   class="user-image rounded-circle shadow"
                   alt="User Image"
                 />
-                <span class="d-none d-md-inline">Alexander Pierce</span>
+                <span id="topbarUserName" class="d-none d-md-inline"></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <!--begin::User Image-->
@@ -229,10 +229,7 @@
                     class="rounded-circle shadow"
                     alt="User Image"
                   />
-                  <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2023</small>
-                  </p>
+                  <p><span id="userMenuFullName"></span></p>
                 </li>
                 <!--end::User Image-->
                 <!--begin::Menu Body-->
@@ -248,8 +245,8 @@
                 <!--end::Menu Body-->
                 <!--begin::Menu Footer-->
                 <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                  <a href="#" class="btn btn-default btn-flat">Profil</a>
+                  <a id="signOutButton" href="#" class="btn btn-danger btn-flat float-end">Çıkış</a>
                 </li>
                 <!--end::Menu Footer-->
               </ul>
@@ -275,7 +272,7 @@
             />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">AdminLTE 4</span>
+            <span class="brand-text fw-light">ADMIN PANEL</span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -297,27 +294,84 @@
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-speedometer"></i>
                   <p>
-                    Dashboard
+                    Makale
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
+                    <a href="../makale-ekle.html" class="nav-link">
+                      <i class="nav-icon bi bi-file-text"></i>
+                      <p>Makale Ekle</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
                     <a href="../index.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v1</p>
+                      <i class="nav-icon bi bi-list-ul"></i>
+                      <p>Makaleleri Listele</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-person-badge"></i>
+                  <p>
+                    Yazar
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="../yazar-ekle.html" class="nav-link">
+                      <i class="nav-icon bi bi-plus-circle"></i>
+                      <p>Yazar Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../index2.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v2</p>
+                    <a href="../yazar-index.html" class="nav-link">
+                      <i class="nav-icon bi bi-list-ul"></i>
+                      <p>Yazarları Listele</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-tags"></i>
+                  <p>
+                    Kategori
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="../kategori-ekle.html" class="nav-link">
+                      <i class="nav-icon bi bi-plus-circle"></i>
+                      <p>Kategori Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../index3.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v3</p>
+                    <a href="../kategori-index.html" class="nav-link">
+                      <i class="nav-icon bi bi-list-ul"></i>
+                      <p>Kategorileri Listele</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-shield-lock"></i>
+                  <p>
+                    Sistem Yönetimi
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="../sistem-yonetimi/sifre-guncelle.html" class="nav-link">
+                      <i class="nav-icon bi bi-key-fill"></i>
+                      <p>Şifre Güncelle</p>
                     </a>
                   </li>
                 </ul>
@@ -804,7 +858,7 @@
         <!--end::To the end-->
         <!--begin::Copyright-->
         <strong>
-          Copyright &copy; 2014-2025&nbsp;
+          Copyright &copy; 2014-2026&nbsp;
           <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
         </strong>
         All rights reserved.
@@ -833,24 +887,427 @@
     <script src="../js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
-            },
-          });
-        }
-      });
+      (function () {
+        const deploymentPath = '../';
+        const API_BASE_URL = 'http://testmb.runasp.net/api';
+
+        const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+        const Default = {
+          scrollbarTheme: 'os-theme-light',
+          scrollbarAutoHide: 'leave',
+          scrollbarClickScroll: true,
+        };
+
+        const AUTH_TOKEN_KEY = 'adminlte_auth_token';
+        const AUTH_USER_NAME_KEY = 'adminlte_user_name';
+        const PUBLIC_PAGE_PATTERN =
+          /\/examples\/(?:login(?:-v2)?|register(?:-v2)?)(?:\.html)?\/?$/i;
+        const TOAST_STYLE_ID = 'adminlte-toast-styles';
+        const TOAST_CONTAINER_ID = 'toast-container';
+
+        // Make API_BASE_URL globally available
+        globalThis.API_BASE_URL = API_BASE_URL;
+
+        const getRequestUrl = (input) => {
+          if (typeof input === 'string') return input;
+          if (input instanceof URL) return input.toString();
+          if (input && typeof input.url === 'string') return input.url;
+          return '';
+        };
+
+        const getToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+        const getStoredDisplayName = () => (localStorage.getItem(AUTH_USER_NAME_KEY) || '').trim();
+
+        const decodeJwtPayload = (token) => {
+          if (!token || typeof token !== 'string') return null;
+
+          const tokenParts = token.split('.');
+          if (tokenParts.length < 2) return null;
+
+          try {
+            const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+            const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+            const json = atob(paddedBase64);
+            return JSON.parse(json);
+          } catch {
+            return null;
+          }
+        };
+
+        const readClaimValue = (payload, claimKeys = []) => {
+          for (const key of claimKeys) {
+            const value = payload?.[key];
+            if (typeof value === 'string' && value.trim()) {
+              return value.trim();
+            }
+          }
+
+          return '';
+        };
+
+        const isLikelyEmail = (value) => /@/.test(value);
+
+        const isInvalidDisplayName = (value, payload = null) => {
+          const normalizedValue = (value || '').toString().trim().toLowerCase();
+          if (!normalizedValue) return true;
+          if (isLikelyEmail(normalizedValue)) return true;
+
+          if (payload) {
+            const usernameLikeClaims = ['unique_name', 'username', 'preferred_username', 'email'];
+
+            for (const claimKey of usernameLikeClaims) {
+              const claimValue = (payload?.[claimKey] || '').toString().trim().toLowerCase();
+              if (claimValue && claimValue === normalizedValue) {
+                return true;
+              }
+            }
+          }
+
+          return false;
+        };
+
+        const getUserIdFromToken = () => {
+          const token = getToken();
+          const payload = decodeJwtPayload(token);
+          if (!payload) return '';
+
+          return readClaimValue(payload, [
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
+            'nameid',
+            'userId',
+            'userid',
+            'id',
+            'sub',
+          ]);
+        };
+
+        const getNameFromPayload = (payload) => {
+          if (!payload || typeof payload !== 'object') return '';
+
+          const source =
+            payload.user ||
+            payload.data?.user ||
+            payload.result?.user ||
+            payload.data ||
+            payload.result ||
+            payload;
+
+          const firstName = (
+            source.firstName ||
+            source.firstname ||
+            source.FirstName ||
+            payload.firstName ||
+            payload.firstname ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          const lastName = (
+            source.lastName ||
+            source.lastname ||
+            source.LastName ||
+            payload.lastName ||
+            payload.lastname ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          const fullName = (
+            source.fullName ||
+            source.fullname ||
+            source.FullName ||
+            source.name ||
+            payload.fullName ||
+            payload.fullname ||
+            payload.name ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+
+          return fullName;
+        };
+
+        const fetchDisplayNameFromUserApi = async () => {
+          const userId = getUserIdFromToken();
+
+          const endpoints = [
+            userId ? `${API_BASE_URL}/User/GetById/${userId}` : '',
+            userId ? `${API_BASE_URL}/User/${userId}` : '',
+            userId ? `${API_BASE_URL}/Users/${userId}` : '',
+            `${API_BASE_URL}/User/GetCurrentUser`,
+            `${API_BASE_URL}/Auth/me`,
+            `${API_BASE_URL}/Auth/profile`,
+          ].filter(Boolean);
+
+          for (const endpoint of endpoints) {
+            try {
+              const response = await fetch(endpoint, { method: 'GET' });
+              if (!response.ok) continue;
+
+              const responseText = await response.text();
+              if (!responseText) continue;
+
+              let parsedBody = null;
+              try {
+                parsedBody = JSON.parse(responseText);
+              } catch {
+                continue;
+              }
+
+              const displayName = getNameFromPayload(parsedBody);
+              if (displayName) {
+                localStorage.setItem(AUTH_USER_NAME_KEY, displayName);
+                return displayName;
+              }
+            } catch {
+              // Endpoint yoksa sıradakini dene.
+            }
+          }
+
+          return '';
+        };
+
+        const getDisplayNameFromToken = () => {
+          const token = getToken();
+          const payload = decodeJwtPayload(token);
+          const storedName = getStoredDisplayName();
+          if (storedName && !isInvalidDisplayName(storedName, payload)) {
+            return storedName;
+          }
+
+          if (storedName && isInvalidDisplayName(storedName, payload)) {
+            localStorage.removeItem(AUTH_USER_NAME_KEY);
+          }
+
+          if (!payload) return '';
+
+          const fullName = readClaimValue(payload, [
+            'name',
+            'fullName',
+            'fullname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
+          ]);
+
+          const firstName = readClaimValue(payload, [
+            'given_name',
+            'givenName',
+            'firstName',
+            'firstname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+          ]);
+
+          const lastName = readClaimValue(payload, [
+            'family_name',
+            'familyName',
+            'lastName',
+            'lastname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+          ]);
+
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+
+          if (fullName) return fullName;
+
+          return '';
+        };
+
+        const setTopbarUserInfo = (displayName) => {
+          if (!displayName) return;
+
+          const topbarName = document.getElementById('topbarUserName');
+          if (topbarName) {
+            topbarName.textContent = displayName;
+          }
+
+          const menuFullName = document.getElementById('userMenuFullName');
+          if (menuFullName) {
+            menuFullName.textContent = displayName;
+          }
+        };
+
+        const updateTopbarUserInfo = async () => {
+          const cachedOrTokenName = getDisplayNameFromToken();
+          if (cachedOrTokenName) {
+            setTopbarUserInfo(cachedOrTokenName);
+          }
+
+          const apiDisplayName = await fetchDisplayNameFromUserApi();
+          if (apiDisplayName) {
+            setTopbarUserInfo(apiDisplayName);
+          }
+        };
+
+        const ensureToastStyles = () => {
+          if (document.getElementById(TOAST_STYLE_ID)) return;
+
+          const style = document.createElement('style');
+          style.id = TOAST_STYLE_ID;
+          style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(24px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+  `;
+          document.head.append(style);
+        };
+
+        const ensureToastContainer = () => {
+          let container = document.getElementById(TOAST_CONTAINER_ID);
+
+          if (!container) {
+            container = document.createElement('div');
+            container.id = TOAST_CONTAINER_ID;
+            container.style.position = 'fixed';
+            container.style.top = '20px';
+            container.style.right = '20px';
+            container.style.zIndex = '9999';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '10px';
+            document.body.append(container);
+          }
+
+          return container;
+        };
+
+        const showToast = (message, type = 'success') => {
+          ensureToastStyles();
+          const container = ensureToastContainer();
+
+          const toast = document.createElement('div');
+          toast.style.minWidth = '320px';
+          toast.style.padding = '16px 20px';
+          toast.style.borderRadius = '6px';
+          toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+          toast.style.fontSize = '14px';
+          toast.style.fontWeight = '500';
+          toast.style.color = 'white';
+          toast.style.animation = 'slideIn 0.3s ease-out';
+          toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+
+          const messageDiv = document.createElement('div');
+          messageDiv.textContent = message;
+          messageDiv.style.marginBottom = '8px';
+
+          const bar = document.createElement('div');
+          bar.style.width = '100%';
+          bar.style.height = '3px';
+          bar.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+          bar.style.borderRadius = '2px';
+          bar.style.overflow = 'hidden';
+
+          const progress = document.createElement('div');
+          progress.style.width = '100%';
+          progress.style.height = '100%';
+          progress.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+          progress.style.animation = 'progress 4s linear forwards';
+
+          bar.append(progress);
+          toast.append(messageDiv, bar);
+          container.append(toast);
+
+          setTimeout(() => {
+            toast.remove();
+          }, 4000);
+        };
+
+        globalThis.showToast = showToast;
+
+        const resolveUrlFromCurrentPage = (relativePath) => {
+          return new URL(relativePath, globalThis.location.href).toString();
+        };
+
+        const getLoginUrl = () =>
+          resolveUrlFromCurrentPage(`${deploymentPath}examples/login-v2.html`);
+        const getHomeUrl = () => resolveUrlFromCurrentPage(`${deploymentPath}index.html`);
+
+        const clearAuthTokenAndRedirect = () => {
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+          localStorage.removeItem(AUTH_USER_NAME_KEY);
+          const target = getLoginUrl();
+          if (globalThis.location.href !== target) {
+            globalThis.location.replace(target);
+          }
+        };
+
+        const shouldProtectCurrentPage = () =>
+          !PUBLIC_PAGE_PATTERN.test(globalThis.location.pathname);
+
+        const shouldAttachAuthHeader = (requestUrl) => {
+          if (!requestUrl) return false;
+          return requestUrl.startsWith(API_BASE_URL);
+        };
+
+        const originalFetch = globalThis.fetch.bind(globalThis);
+        globalThis.fetch = async (input, init = {}) => {
+          const requestUrl = getRequestUrl(input);
+          const token = getToken();
+          const nextInit = { ...init };
+
+          if (token && shouldAttachAuthHeader(requestUrl)) {
+            const headers = new Headers(init?.headers || {});
+            if (!headers.has('Authorization')) {
+              headers.set('Authorization', `Bearer ${token}`);
+            }
+            nextInit.headers = headers;
+          }
+
+          const response = await originalFetch(input, nextInit);
+
+          if (response.status === 401 && shouldProtectCurrentPage()) {
+            clearAuthTokenAndRedirect();
+          }
+
+          return response;
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+          const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+          if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+              scrollbars: {
+                theme: Default.scrollbarTheme,
+                autoHide: Default.scrollbarAutoHide,
+                clickScroll: Default.scrollbarClickScroll,
+              },
+            });
+          }
+
+          if (shouldProtectCurrentPage() && !getToken()) {
+            clearAuthTokenAndRedirect();
+            return;
+          }
+
+          if (!shouldProtectCurrentPage() && getToken()) {
+            globalThis.location.replace(getHomeUrl());
+            return;
+          }
+
+          updateTopbarUserInfo();
+
+          const signOutButton = document.getElementById('signOutButton');
+          if (signOutButton) {
+            signOutButton.addEventListener('click', (event) => {
+              event.preventDefault();
+              clearAuthTokenAndRedirect();
+            });
+          }
+        });
+      })();
     </script>
     <!--end::OverlayScrollbars Configure-->
     <!--end::Script-->

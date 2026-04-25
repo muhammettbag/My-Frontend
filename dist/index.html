@@ -72,6 +72,20 @@
   <!--end::Head-->
   <!--begin::Body-->
   <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div
+      id="toast-container"
+      style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      "
+    ></div>
+    <!--end::Toast Container-->
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!--begin::Header-->
@@ -231,7 +245,7 @@
                   class="user-image rounded-circle shadow"
                   alt="User Image"
                 />
-                <span class="d-none d-md-inline">Alexander Pierce</span>
+                <span id="topbarUserName" class="d-none d-md-inline"></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <!--begin::User Image-->
@@ -241,10 +255,7 @@
                     class="rounded-circle shadow"
                     alt="User Image"
                   />
-                  <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2023</small>
-                  </p>
+                  <p><span id="userMenuFullName"></span></p>
                 </li>
                 <!--end::User Image-->
                 <!--begin::Menu Body-->
@@ -260,8 +271,8 @@
                 <!--end::Menu Body-->
                 <!--begin::Menu Footer-->
                 <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                  <a href="#" class="btn btn-default btn-flat">Profil</a>
+                  <a id="signOutButton" href="#" class="btn btn-danger btn-flat float-end">Çıkış</a>
                 </li>
                 <!--end::Menu Footer-->
               </ul>
@@ -287,7 +298,7 @@
             />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">AdminLTE 4</span>
+            <span class="brand-text fw-light">ADMIN PANEL</span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -309,27 +320,84 @@
                 <a href="#" class="nav-link active">
                   <i class="nav-icon bi bi-speedometer"></i>
                   <p>
-                    Dashboard
+                    Makale
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
+                    <a href="./makale-ekle.html" class="nav-link">
+                      <i class="nav-icon bi bi-file-text"></i>
+                      <p>Makale Ekle</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
                     <a href="./index.html" class="nav-link active">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v1</p>
+                      <i class="nav-icon bi bi-list-ul"></i>
+                      <p>Makaleleri Listele</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-person-badge"></i>
+                  <p>
+                    Yazar
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="./yazar-ekle.html" class="nav-link">
+                      <i class="nav-icon bi bi-plus-circle"></i>
+                      <p>Yazar Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="./index2.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v2</p>
+                    <a href="./yazar-index.html" class="nav-link">
+                      <i class="nav-icon bi bi-list-ul"></i>
+                      <p>Yazarları Listele</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-tags"></i>
+                  <p>
+                    Kategori
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="./kategori-ekle.html" class="nav-link">
+                      <i class="nav-icon bi bi-plus-circle"></i>
+                      <p>Kategori Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="./index3.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v3</p>
+                    <a href="./kategori-index.html" class="nav-link">
+                      <i class="nav-icon bi bi-list-ul"></i>
+                      <p>Kategorileri Listele</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-shield-lock"></i>
+                  <p>
+                    Sistem Yönetimi
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="./sistem-yonetimi/sifre-guncelle.html" class="nav-link">
+                      <i class="nav-icon bi bi-key-fill"></i>
+                      <p>Şifre Güncelle</p>
                     </a>
                   </li>
                 </ul>
@@ -744,444 +812,164 @@
       <!--end::Sidebar-->
       <!--begin::App Main-->
       <main class="app-main">
-        <!--begin::App Content Header-->
         <div class="app-content-header">
-          <!--begin::Container-->
           <div class="container-fluid">
-            <!--begin::Row-->
             <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">Dashboard</h3></div>
+              <div class="col-sm-6"><h3 class="mb-0">Makale</h3></div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="#">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                  <li class="breadcrumb-item"><a href="#">Makale</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Makale Ekle / Makale Listesi
+                  </li>
                 </ol>
               </div>
             </div>
-            <!--end::Row-->
           </div>
-          <!--end::Container-->
         </div>
-        <!--end::App Content Header-->
-        <!--begin::App Content-->
         <div class="app-content">
-          <!--begin::Container-->
           <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-              <!--begin::Col-->
-              <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 1-->
-                <div class="small-box text-bg-primary">
-                  <div class="inner">
-                    <h3>150</h3>
-                    <p>New Orders</p>
-                  </div>
-                  <svg
-                    class="small-box-icon"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
+            <div id="makale-liste-view" class="card card-primary card-outline">
+              <div class="card-header d-flex align-items-center gap-2">
+                <h3 class="card-title mb-0">Makale Listesi</h3>
+                <div class="d-flex gap-2">
+                  <button
+                    id="makaleImportButton"
+                    type="button"
+                    class="btn btn-outline-info btn-sm"
+                    onclick="makaleExcelSec()"
                   >
-                    <path
-                      d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"
-                    ></path>
-                  </svg>
-                  <a
-                    href="#"
-                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover"
+                    Excel Yükle
+                  </button>
+                  <button
+                    id="makaleExportButton"
+                    type="button"
+                    class="btn btn-outline-success btn-sm"
+                    onclick="makaleleriExcelIndir()"
                   >
-                    More info <i class="bi bi-link-45deg"></i>
-                  </a>
+                    Excel İndir
+                  </button>
+                  <a href="./makale-ekle.html" class="btn btn-primary btn-sm"> Makale Ekle </a>
                 </div>
-                <!--end::Small Box Widget 1-->
+                <input id="makaleImportFileInput" type="file" class="d-none" accept=".xlsx,.xls" />
+                <button
+                  id="makaleRefreshButton"
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm ms-auto"
+                  onclick="makaleleriYenile()"
+                >
+                  Yenile
+                </button>
               </div>
-              <!--end::Col-->
-              <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 2-->
-                <div class="small-box text-bg-success">
-                  <div class="inner">
-                    <h3>53<sup class="fs-5">%</sup></h3>
-                    <p>Bounce Rate</p>
-                  </div>
-                  <svg
-                    class="small-box-icon"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 01-1.875-1.875V8.625zM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 013 19.875v-6.75z"
-                    ></path>
-                  </svg>
-                  <a
-                    href="#"
-                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover"
-                  >
-                    More info <i class="bi bi-link-45deg"></i>
-                  </a>
-                </div>
-                <!--end::Small Box Widget 2-->
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 80px">#</th>
+                      <th>Başlık</th>
+                      <th>Rozet</th>
+                      <th style="width: 160px">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="makaleTablosu">
+                    <tr>
+                      <td colspan="4" class="text-center">Yükleniyor...</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <!--end::Col-->
-              <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 3-->
-                <div class="small-box text-bg-warning">
-                  <div class="inner">
-                    <h3>44</h3>
-                    <p>User Registrations</p>
-                  </div>
-                  <svg
-                    class="small-box-icon"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"
-                    ></path>
-                  </svg>
-                  <a
-                    href="#"
-                    class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover"
-                  >
-                    More info <i class="bi bi-link-45deg"></i>
-                  </a>
-                </div>
-                <!--end::Small Box Widget 3-->
+              <div class="card-footer d-flex justify-content-center">
+                <nav aria-label="Makale sayfalama">
+                  <ul id="makalePagination" class="pagination pagination-sm mb-0"></ul>
+                </nav>
               </div>
-              <!--end::Col-->
-              <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 4-->
-                <div class="small-box text-bg-danger">
-                  <div class="inner">
-                    <h3>65</h3>
-                    <p>Unique Visitors</p>
-                  </div>
-                  <svg
-                    class="small-box-icon"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      fill-rule="evenodd"
-                      d="M2.25 13.5a8.25 8.25 0 018.25-8.25.75.75 0 01.75.75v6.75H18a.75.75 0 01.75.75 8.25 8.25 0 01-16.5 0z"
-                    ></path>
-                    <path
-                      clip-rule="evenodd"
-                      fill-rule="evenodd"
-                      d="M12.75 3a.75.75 0 01.75-.75 8.25 8.25 0 018.25 8.25.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75V3z"
-                    ></path>
-                  </svg>
-                  <a
-                    href="#"
-                    class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover"
-                  >
-                    More info <i class="bi bi-link-45deg"></i>
-                  </a>
-                </div>
-                <!--end::Small Box Widget 4-->
-              </div>
-              <!--end::Col-->
             </div>
-            <!--end::Row-->
-            <!--begin::Row-->
-            <div class="row">
-              <!-- Start col -->
-              <div class="col-lg-7 connectedSortable">
-                <div class="card mb-4">
-                  <div class="card-header"><h3 class="card-title">Sales Value</h3></div>
-                  <div class="card-body"><div id="revenue-chart"></div></div>
-                </div>
-                <!-- /.card -->
-                <!-- DIRECT CHAT -->
-                <div class="card direct-chat direct-chat-primary mb-4">
-                  <div class="card-header">
-                    <h3 class="card-title">Direct Chat</h3>
-                    <div class="card-tools">
-                      <span title="3 New Messages" class="badge text-bg-primary"> 3 </span>
-                      <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
-                        <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                        <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        title="Contacts"
-                        data-lte-toggle="chat-pane"
-                      >
-                        <i class="bi bi-chat-text-fill"></i>
-                      </button>
-                      <button type="button" class="btn btn-tool" data-lte-toggle="card-remove">
-                        <i class="bi bi-x-lg"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <!-- Conversations are loaded here -->
-                    <div class="direct-chat-messages">
-                      <!-- Message. Default to the start -->
-                      <div class="direct-chat-msg">
-                        <div class="direct-chat-infos clearfix">
-                          <span class="direct-chat-name float-start"> Alexander Pierce </span>
-                          <span class="direct-chat-timestamp float-end"> 23 Jan 2:00 pm </span>
-                        </div>
-                        <!-- /.direct-chat-infos -->
-                        <img
-                          class="direct-chat-img"
-                          src="./assets/img/user1-128x128.jpg"
-                          alt="message user image"
-                        />
-                        <!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">
-                          Is this template really for free? That's unbelievable!
-                        </div>
-                        <!-- /.direct-chat-text -->
-                      </div>
-                      <!-- /.direct-chat-msg -->
-                      <!-- Message to the end -->
-                      <div class="direct-chat-msg end">
-                        <div class="direct-chat-infos clearfix">
-                          <span class="direct-chat-name float-end"> Sarah Bullock </span>
-                          <span class="direct-chat-timestamp float-start"> 23 Jan 2:05 pm </span>
-                        </div>
-                        <!-- /.direct-chat-infos -->
-                        <img
-                          class="direct-chat-img"
-                          src="./assets/img/user3-128x128.jpg"
-                          alt="message user image"
-                        />
-                        <!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">You better believe it!</div>
-                        <!-- /.direct-chat-text -->
-                      </div>
-                      <!-- /.direct-chat-msg -->
-                      <!-- Message. Default to the start -->
-                      <div class="direct-chat-msg">
-                        <div class="direct-chat-infos clearfix">
-                          <span class="direct-chat-name float-start"> Alexander Pierce </span>
-                          <span class="direct-chat-timestamp float-end"> 23 Jan 5:37 pm </span>
-                        </div>
-                        <!-- /.direct-chat-infos -->
-                        <img
-                          class="direct-chat-img"
-                          src="./assets/img/user1-128x128.jpg"
-                          alt="message user image"
-                        />
-                        <!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">
-                          Working with AdminLTE on a great new app! Wanna join?
-                        </div>
-                        <!-- /.direct-chat-text -->
-                      </div>
-                      <!-- /.direct-chat-msg -->
-                      <!-- Message to the end -->
-                      <div class="direct-chat-msg end">
-                        <div class="direct-chat-infos clearfix">
-                          <span class="direct-chat-name float-end"> Sarah Bullock </span>
-                          <span class="direct-chat-timestamp float-start"> 23 Jan 6:10 pm </span>
-                        </div>
-                        <!-- /.direct-chat-infos -->
-                        <img
-                          class="direct-chat-img"
-                          src="./assets/img/user3-128x128.jpg"
-                          alt="message user image"
-                        />
-                        <!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">I would love to.</div>
-                        <!-- /.direct-chat-text -->
-                      </div>
-                      <!-- /.direct-chat-msg -->
-                    </div>
-                    <!-- /.direct-chat-messages-->
-                    <!-- Contacts are loaded here -->
-                    <div class="direct-chat-contacts">
-                      <ul class="contacts-list">
-                        <li>
-                          <a href="#">
-                            <img
-                              class="contacts-list-img"
-                              src="./assets/img/user1-128x128.jpg"
-                              alt="User Avatar"
-                            />
-                            <div class="contacts-list-info">
-                              <span class="contacts-list-name">
-                                Count Dracula
-                                <small class="contacts-list-date float-end"> 2/28/2023 </small>
-                              </span>
-                              <span class="contacts-list-msg"> How have you been? I was... </span>
-                            </div>
-                            <!-- /.contacts-list-info -->
-                          </a>
-                        </li>
-                        <!-- End Contact Item -->
-                        <li>
-                          <a href="#">
-                            <img
-                              class="contacts-list-img"
-                              src="./assets/img/user7-128x128.jpg"
-                              alt="User Avatar"
-                            />
-                            <div class="contacts-list-info">
-                              <span class="contacts-list-name">
-                                Sarah Doe
-                                <small class="contacts-list-date float-end"> 2/23/2023 </small>
-                              </span>
-                              <span class="contacts-list-msg"> I will be waiting for... </span>
-                            </div>
-                            <!-- /.contacts-list-info -->
-                          </a>
-                        </li>
-                        <!-- End Contact Item -->
-                        <li>
-                          <a href="#">
-                            <img
-                              class="contacts-list-img"
-                              src="./assets/img/user3-128x128.jpg"
-                              alt="User Avatar"
-                            />
-                            <div class="contacts-list-info">
-                              <span class="contacts-list-name">
-                                Nadia Jolie
-                                <small class="contacts-list-date float-end"> 2/20/2023 </small>
-                              </span>
-                              <span class="contacts-list-msg"> I'll call you back at... </span>
-                            </div>
-                            <!-- /.contacts-list-info -->
-                          </a>
-                        </li>
-                        <!-- End Contact Item -->
-                        <li>
-                          <a href="#">
-                            <img
-                              class="contacts-list-img"
-                              src="./assets/img/user5-128x128.jpg"
-                              alt="User Avatar"
-                            />
-                            <div class="contacts-list-info">
-                              <span class="contacts-list-name">
-                                Nora S. Vans
-                                <small class="contacts-list-date float-end"> 2/10/2023 </small>
-                              </span>
-                              <span class="contacts-list-msg"> Where is your new... </span>
-                            </div>
-                            <!-- /.contacts-list-info -->
-                          </a>
-                        </li>
-                        <!-- End Contact Item -->
-                        <li>
-                          <a href="#">
-                            <img
-                              class="contacts-list-img"
-                              src="./assets/img/user6-128x128.jpg"
-                              alt="User Avatar"
-                            />
-                            <div class="contacts-list-info">
-                              <span class="contacts-list-name">
-                                John K.
-                                <small class="contacts-list-date float-end"> 1/27/2023 </small>
-                              </span>
-                              <span class="contacts-list-msg"> Can I take a look at... </span>
-                            </div>
-                            <!-- /.contacts-list-info -->
-                          </a>
-                        </li>
-                        <!-- End Contact Item -->
-                        <li>
-                          <a href="#">
-                            <img
-                              class="contacts-list-img"
-                              src="./assets/img/user8-128x128.jpg"
-                              alt="User Avatar"
-                            />
-                            <div class="contacts-list-info">
-                              <span class="contacts-list-name">
-                                Kenneth M.
-                                <small class="contacts-list-date float-end"> 1/4/2023 </small>
-                              </span>
-                              <span class="contacts-list-msg"> Never mind I found... </span>
-                            </div>
-                            <!-- /.contacts-list-info -->
-                          </a>
-                        </li>
-                        <!-- End Contact Item -->
-                      </ul>
-                      <!-- /.contacts-list -->
-                    </div>
-                    <!-- /.direct-chat-pane -->
-                  </div>
-                  <!-- /.card-body -->
-                  <div class="card-footer">
-                    <form action="#" method="post">
-                      <div class="input-group">
-                        <input
-                          type="text"
-                          name="message"
-                          placeholder="Type Message ..."
-                          class="form-control"
-                        />
-                        <span class="input-group-append">
-                          <button type="button" class="btn btn-primary">Send</button>
-                        </span>
-                      </div>
-                    </form>
-                  </div>
-                  <!-- /.card-footer-->
-                </div>
-                <!-- /.direct-chat -->
+            <div id="makale-form-view" class="card card-success card-outline" style="display: none">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 id="makaleFormBaslik" class="card-title mb-0">Makale Ekle</h3>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm"
+                  onclick="listeyiGoster()"
+                >
+                  Listeye Dön
+                </button>
               </div>
-              <!-- /.Start col -->
-              <!-- Start col -->
-              <div class="col-lg-5 connectedSortable">
-                <div class="card text-white bg-primary bg-gradient border-primary mb-4">
-                  <div class="card-header border-0">
-                    <h3 class="card-title">Sales Value</h3>
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-primary btn-sm"
-                        data-lte-toggle="card-collapse"
-                      >
-                        <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                        <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                      </button>
+              <form id="makaleForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12 col-md-8">
+                      <label for="makaleTitle" class="form-label">Başlık</label>
+                      <input
+                        id="makaleTitle"
+                        name="title"
+                        type="text"
+                        class="form-control"
+                        placeholder="Makale başlığını yazın"
+                        required
+                      />
                     </div>
-                  </div>
-                  <div class="card-body"><div id="world-map" style="height: 220px"></div></div>
-                  <div class="card-footer border-0">
-                    <!--begin::Row-->
-                    <div class="row">
-                      <div class="col-4 text-center">
-                        <div id="sparkline-1" class="text-dark"></div>
-                        <div class="text-white">Visitors</div>
-                      </div>
-                      <div class="col-4 text-center">
-                        <div id="sparkline-2" class="text-dark"></div>
-                        <div class="text-white">Online</div>
-                      </div>
-                      <div class="col-4 text-center">
-                        <div id="sparkline-3" class="text-dark"></div>
-                        <div class="text-white">Sales</div>
-                      </div>
+                    <div class="col-12 col-md-4">
+                      <label for="makaleBadge" class="form-label">Rozet</label>
+                      <input
+                        id="makaleBadge"
+                        name="badge"
+                        type="text"
+                        class="form-control"
+                        placeholder="Yeni, Önemli vb."
+                      />
                     </div>
-                    <!--end::Row-->
+                    <div class="col-12">
+                      <label for="makaleContent" class="form-label">İçerik</label>
+                      <textarea
+                        id="makaleContent"
+                        name="content"
+                        class="form-control"
+                        rows="8"
+                        placeholder="Makale içeriğini buraya yazın"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label for="makaleImageUrl" class="form-label">Görsel URL</label>
+                      <input
+                        id="makaleImageUrl"
+                        name="imageUrl"
+                        type="url"
+                        class="form-control"
+                        placeholder="https://..."
+                        required
+                      />
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="makaleCategoryId" class="form-label">Kategori</label>
+                      <select id="makaleCategoryId" name="categoryId" class="form-select" required>
+                        <option value="">Kategori Seçiniz</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                      <label for="makaleAuthorId" class="form-label">Yazar</label>
+                      <select id="makaleAuthorId" name="authorId" class="form-select" required>
+                        <option value="">Yazar Seçiniz</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <!-- /.Start col -->
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <button type="button" class="btn btn-secondary" onclick="listeyiGoster()">
+                    Vazgeç
+                  </button>
+                  <button id="makaleFormSubmitBtn" type="submit" class="btn btn-success">
+                    Kaydet
+                  </button>
+                </div>
+              </form>
             </div>
-            <!-- /.row (main row) -->
           </div>
-          <!--end::Container-->
         </div>
-        <!--end::App Content-->
+        <script
+          type="module"
+          src="/_astro/index.astro_astro_type_script_index_0_lang.BHBWVfDx.js"
+        ></script>
       </main>
       <!--end::App Main-->
       <!--begin::Footer-->
@@ -1191,7 +979,7 @@
         <!--end::To the end-->
         <!--begin::Copyright-->
         <strong>
-          Copyright &copy; 2014-2025&nbsp;
+          Copyright &copy; 2014-2026&nbsp;
           <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
         </strong>
         All rights reserved.
@@ -1200,7 +988,6 @@
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
-    <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
@@ -1220,24 +1007,427 @@
     <script src="./js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
-            },
-          });
-        }
-      });
+      (function () {
+        const deploymentPath = './';
+        const API_BASE_URL = 'http://testmb.runasp.net/api';
+
+        const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+        const Default = {
+          scrollbarTheme: 'os-theme-light',
+          scrollbarAutoHide: 'leave',
+          scrollbarClickScroll: true,
+        };
+
+        const AUTH_TOKEN_KEY = 'adminlte_auth_token';
+        const AUTH_USER_NAME_KEY = 'adminlte_user_name';
+        const PUBLIC_PAGE_PATTERN =
+          /\/examples\/(?:login(?:-v2)?|register(?:-v2)?)(?:\.html)?\/?$/i;
+        const TOAST_STYLE_ID = 'adminlte-toast-styles';
+        const TOAST_CONTAINER_ID = 'toast-container';
+
+        // Make API_BASE_URL globally available
+        globalThis.API_BASE_URL = API_BASE_URL;
+
+        const getRequestUrl = (input) => {
+          if (typeof input === 'string') return input;
+          if (input instanceof URL) return input.toString();
+          if (input && typeof input.url === 'string') return input.url;
+          return '';
+        };
+
+        const getToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+        const getStoredDisplayName = () => (localStorage.getItem(AUTH_USER_NAME_KEY) || '').trim();
+
+        const decodeJwtPayload = (token) => {
+          if (!token || typeof token !== 'string') return null;
+
+          const tokenParts = token.split('.');
+          if (tokenParts.length < 2) return null;
+
+          try {
+            const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+            const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+            const json = atob(paddedBase64);
+            return JSON.parse(json);
+          } catch {
+            return null;
+          }
+        };
+
+        const readClaimValue = (payload, claimKeys = []) => {
+          for (const key of claimKeys) {
+            const value = payload?.[key];
+            if (typeof value === 'string' && value.trim()) {
+              return value.trim();
+            }
+          }
+
+          return '';
+        };
+
+        const isLikelyEmail = (value) => /@/.test(value);
+
+        const isInvalidDisplayName = (value, payload = null) => {
+          const normalizedValue = (value || '').toString().trim().toLowerCase();
+          if (!normalizedValue) return true;
+          if (isLikelyEmail(normalizedValue)) return true;
+
+          if (payload) {
+            const usernameLikeClaims = ['unique_name', 'username', 'preferred_username', 'email'];
+
+            for (const claimKey of usernameLikeClaims) {
+              const claimValue = (payload?.[claimKey] || '').toString().trim().toLowerCase();
+              if (claimValue && claimValue === normalizedValue) {
+                return true;
+              }
+            }
+          }
+
+          return false;
+        };
+
+        const getUserIdFromToken = () => {
+          const token = getToken();
+          const payload = decodeJwtPayload(token);
+          if (!payload) return '';
+
+          return readClaimValue(payload, [
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
+            'nameid',
+            'userId',
+            'userid',
+            'id',
+            'sub',
+          ]);
+        };
+
+        const getNameFromPayload = (payload) => {
+          if (!payload || typeof payload !== 'object') return '';
+
+          const source =
+            payload.user ||
+            payload.data?.user ||
+            payload.result?.user ||
+            payload.data ||
+            payload.result ||
+            payload;
+
+          const firstName = (
+            source.firstName ||
+            source.firstname ||
+            source.FirstName ||
+            payload.firstName ||
+            payload.firstname ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          const lastName = (
+            source.lastName ||
+            source.lastname ||
+            source.LastName ||
+            payload.lastName ||
+            payload.lastname ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          const fullName = (
+            source.fullName ||
+            source.fullname ||
+            source.FullName ||
+            source.name ||
+            payload.fullName ||
+            payload.fullname ||
+            payload.name ||
+            ''
+          )
+            .toString()
+            .trim();
+
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+
+          return fullName;
+        };
+
+        const fetchDisplayNameFromUserApi = async () => {
+          const userId = getUserIdFromToken();
+
+          const endpoints = [
+            userId ? `${API_BASE_URL}/User/GetById/${userId}` : '',
+            userId ? `${API_BASE_URL}/User/${userId}` : '',
+            userId ? `${API_BASE_URL}/Users/${userId}` : '',
+            `${API_BASE_URL}/User/GetCurrentUser`,
+            `${API_BASE_URL}/Auth/me`,
+            `${API_BASE_URL}/Auth/profile`,
+          ].filter(Boolean);
+
+          for (const endpoint of endpoints) {
+            try {
+              const response = await fetch(endpoint, { method: 'GET' });
+              if (!response.ok) continue;
+
+              const responseText = await response.text();
+              if (!responseText) continue;
+
+              let parsedBody = null;
+              try {
+                parsedBody = JSON.parse(responseText);
+              } catch {
+                continue;
+              }
+
+              const displayName = getNameFromPayload(parsedBody);
+              if (displayName) {
+                localStorage.setItem(AUTH_USER_NAME_KEY, displayName);
+                return displayName;
+              }
+            } catch {
+              // Endpoint yoksa sıradakini dene.
+            }
+          }
+
+          return '';
+        };
+
+        const getDisplayNameFromToken = () => {
+          const token = getToken();
+          const payload = decodeJwtPayload(token);
+          const storedName = getStoredDisplayName();
+          if (storedName && !isInvalidDisplayName(storedName, payload)) {
+            return storedName;
+          }
+
+          if (storedName && isInvalidDisplayName(storedName, payload)) {
+            localStorage.removeItem(AUTH_USER_NAME_KEY);
+          }
+
+          if (!payload) return '';
+
+          const fullName = readClaimValue(payload, [
+            'name',
+            'fullName',
+            'fullname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
+          ]);
+
+          const firstName = readClaimValue(payload, [
+            'given_name',
+            'givenName',
+            'firstName',
+            'firstname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+          ]);
+
+          const lastName = readClaimValue(payload, [
+            'family_name',
+            'familyName',
+            'lastName',
+            'lastname',
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+          ]);
+
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+
+          if (fullName) return fullName;
+
+          return '';
+        };
+
+        const setTopbarUserInfo = (displayName) => {
+          if (!displayName) return;
+
+          const topbarName = document.getElementById('topbarUserName');
+          if (topbarName) {
+            topbarName.textContent = displayName;
+          }
+
+          const menuFullName = document.getElementById('userMenuFullName');
+          if (menuFullName) {
+            menuFullName.textContent = displayName;
+          }
+        };
+
+        const updateTopbarUserInfo = async () => {
+          const cachedOrTokenName = getDisplayNameFromToken();
+          if (cachedOrTokenName) {
+            setTopbarUserInfo(cachedOrTokenName);
+          }
+
+          const apiDisplayName = await fetchDisplayNameFromUserApi();
+          if (apiDisplayName) {
+            setTopbarUserInfo(apiDisplayName);
+          }
+        };
+
+        const ensureToastStyles = () => {
+          if (document.getElementById(TOAST_STYLE_ID)) return;
+
+          const style = document.createElement('style');
+          style.id = TOAST_STYLE_ID;
+          style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(24px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+  `;
+          document.head.append(style);
+        };
+
+        const ensureToastContainer = () => {
+          let container = document.getElementById(TOAST_CONTAINER_ID);
+
+          if (!container) {
+            container = document.createElement('div');
+            container.id = TOAST_CONTAINER_ID;
+            container.style.position = 'fixed';
+            container.style.top = '20px';
+            container.style.right = '20px';
+            container.style.zIndex = '9999';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '10px';
+            document.body.append(container);
+          }
+
+          return container;
+        };
+
+        const showToast = (message, type = 'success') => {
+          ensureToastStyles();
+          const container = ensureToastContainer();
+
+          const toast = document.createElement('div');
+          toast.style.minWidth = '320px';
+          toast.style.padding = '16px 20px';
+          toast.style.borderRadius = '6px';
+          toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+          toast.style.fontSize = '14px';
+          toast.style.fontWeight = '500';
+          toast.style.color = 'white';
+          toast.style.animation = 'slideIn 0.3s ease-out';
+          toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+
+          const messageDiv = document.createElement('div');
+          messageDiv.textContent = message;
+          messageDiv.style.marginBottom = '8px';
+
+          const bar = document.createElement('div');
+          bar.style.width = '100%';
+          bar.style.height = '3px';
+          bar.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+          bar.style.borderRadius = '2px';
+          bar.style.overflow = 'hidden';
+
+          const progress = document.createElement('div');
+          progress.style.width = '100%';
+          progress.style.height = '100%';
+          progress.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+          progress.style.animation = 'progress 4s linear forwards';
+
+          bar.append(progress);
+          toast.append(messageDiv, bar);
+          container.append(toast);
+
+          setTimeout(() => {
+            toast.remove();
+          }, 4000);
+        };
+
+        globalThis.showToast = showToast;
+
+        const resolveUrlFromCurrentPage = (relativePath) => {
+          return new URL(relativePath, globalThis.location.href).toString();
+        };
+
+        const getLoginUrl = () =>
+          resolveUrlFromCurrentPage(`${deploymentPath}examples/login-v2.html`);
+        const getHomeUrl = () => resolveUrlFromCurrentPage(`${deploymentPath}index.html`);
+
+        const clearAuthTokenAndRedirect = () => {
+          localStorage.removeItem(AUTH_TOKEN_KEY);
+          localStorage.removeItem(AUTH_USER_NAME_KEY);
+          const target = getLoginUrl();
+          if (globalThis.location.href !== target) {
+            globalThis.location.replace(target);
+          }
+        };
+
+        const shouldProtectCurrentPage = () =>
+          !PUBLIC_PAGE_PATTERN.test(globalThis.location.pathname);
+
+        const shouldAttachAuthHeader = (requestUrl) => {
+          if (!requestUrl) return false;
+          return requestUrl.startsWith(API_BASE_URL);
+        };
+
+        const originalFetch = globalThis.fetch.bind(globalThis);
+        globalThis.fetch = async (input, init = {}) => {
+          const requestUrl = getRequestUrl(input);
+          const token = getToken();
+          const nextInit = { ...init };
+
+          if (token && shouldAttachAuthHeader(requestUrl)) {
+            const headers = new Headers(init?.headers || {});
+            if (!headers.has('Authorization')) {
+              headers.set('Authorization', `Bearer ${token}`);
+            }
+            nextInit.headers = headers;
+          }
+
+          const response = await originalFetch(input, nextInit);
+
+          if (response.status === 401 && shouldProtectCurrentPage()) {
+            clearAuthTokenAndRedirect();
+          }
+
+          return response;
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+          const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+          if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+              scrollbars: {
+                theme: Default.scrollbarTheme,
+                autoHide: Default.scrollbarAutoHide,
+                clickScroll: Default.scrollbarClickScroll,
+              },
+            });
+          }
+
+          if (shouldProtectCurrentPage() && !getToken()) {
+            clearAuthTokenAndRedirect();
+            return;
+          }
+
+          if (!shouldProtectCurrentPage() && getToken()) {
+            globalThis.location.replace(getHomeUrl());
+            return;
+          }
+
+          updateTopbarUserInfo();
+
+          const signOutButton = document.getElementById('signOutButton');
+          if (signOutButton) {
+            signOutButton.addEventListener('click', (event) => {
+              event.preventDefault();
+              clearAuthTokenAndRedirect();
+            });
+          }
+        });
+      })();
     </script>
     <!--end::OverlayScrollbars Configure-->
     <!-- OPTIONAL SCRIPTS -->
@@ -1427,7 +1617,6 @@
       const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
       sparkline3.render();
     </script>
-    <!--end::Script-->
   </body>
   <!--end::Body-->
 </html>

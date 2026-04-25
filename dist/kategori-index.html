@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Browser Support | AdminLTE 4</title>
+    <title>AdminLTE v4 | Kategoriler</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     <!--end::Accessibility Meta Tags-->
     <!--begin::Primary Meta Tags-->
-    <meta name="title" content="Browser Support | AdminLTE 4" />
+    <meta name="title" content="AdminLTE v4 | Kategoriler" />
     <meta name="author" content="ColorlibHQ" />
     <meta
       name="description"
@@ -25,7 +25,7 @@
     <!--begin::Accessibility Features-->
     <!-- Skip links will be dynamically added by accessibility.js -->
     <meta name="supported-color-schemes" content="light dark" />
-    <link rel="preload" href="../css/adminlte.css" as="style" />
+    <link rel="preload" href="./css/adminlte.css" as="style" />
     <!--end::Accessibility Features-->
     <!--begin::Fonts-->
     <link
@@ -52,12 +52,26 @@
     />
     <!--end::Third Party Plugin(Bootstrap Icons)-->
     <!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="../css/adminlte.css" />
+    <link rel="stylesheet" href="./css/adminlte.css" />
     <!--end::Required Plugin(AdminLTE)-->
   </head>
   <!--end::Head-->
   <!--begin::Body-->
   <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::Toast Container-->
+    <div
+      id="toast-container"
+      style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      "
+    ></div>
+    <!--end::Toast Container-->
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!--begin::Header-->
@@ -96,7 +110,7 @@
                   <div class="d-flex">
                     <div class="flex-shrink-0">
                       <img
-                        src="../assets/img/user1-128x128.jpg"
+                        src="./assets/img/user1-128x128.jpg"
                         alt="User Avatar"
                         class="img-size-50 rounded-circle me-3"
                       />
@@ -122,7 +136,7 @@
                   <div class="d-flex">
                     <div class="flex-shrink-0">
                       <img
-                        src="../assets/img/user8-128x128.jpg"
+                        src="./assets/img/user8-128x128.jpg"
                         alt="User Avatar"
                         class="img-size-50 rounded-circle me-3"
                       />
@@ -148,7 +162,7 @@
                   <div class="d-flex">
                     <div class="flex-shrink-0">
                       <img
-                        src="../assets/img/user3-128x128.jpg"
+                        src="./assets/img/user3-128x128.jpg"
                         alt="User Avatar"
                         class="img-size-50 rounded-circle me-3"
                       />
@@ -213,7 +227,7 @@
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <img
-                  src="../assets/img/user2-160x160.jpg"
+                  src="./assets/img/user2-160x160.jpg"
                   class="user-image rounded-circle shadow"
                   alt="User Image"
                 />
@@ -223,7 +237,7 @@
                 <!--begin::User Image-->
                 <li class="user-header text-bg-primary">
                   <img
-                    src="../assets/img/user2-160x160.jpg"
+                    src="./assets/img/user2-160x160.jpg"
                     class="rounded-circle shadow"
                     alt="User Image"
                   />
@@ -261,10 +275,10 @@
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
-          <a href="../index.html" class="brand-link">
+          <a href="./index.html" class="brand-link">
             <!--begin::Brand Image-->
             <img
-              src="../assets/img/AdminLTELogo.png"
+              src="./assets/img/AdminLTELogo.png"
               alt="AdminLTE Logo"
               class="brand-image opacity-75 shadow"
             />
@@ -298,13 +312,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../makale-ekle.html" class="nav-link">
+                    <a href="./makale-ekle.html" class="nav-link">
                       <i class="nav-icon bi bi-file-text"></i>
                       <p>Makale Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../index.html" class="nav-link">
+                    <a href="./index.html" class="nav-link">
                       <i class="nav-icon bi bi-list-ul"></i>
                       <p>Makaleleri Listele</p>
                     </a>
@@ -321,21 +335,21 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../yazar-ekle.html" class="nav-link">
+                    <a href="./yazar-ekle.html" class="nav-link">
                       <i class="nav-icon bi bi-plus-circle"></i>
                       <p>Yazar Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../yazar-index.html" class="nav-link">
+                    <a href="./yazar-index.html" class="nav-link">
                       <i class="nav-icon bi bi-list-ul"></i>
                       <p>Yazarları Listele</p>
                     </a>
                   </li>
                 </ul>
               </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link active">
                   <i class="nav-icon bi bi-tags"></i>
                   <p>
                     Kategori
@@ -344,13 +358,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../kategori-ekle.html" class="nav-link">
+                    <a href="./kategori-ekle.html" class="nav-link">
                       <i class="nav-icon bi bi-plus-circle"></i>
                       <p>Kategori Ekle</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../kategori-index.html" class="nav-link">
+                    <a href="./kategori-index.html" class="nav-link active">
                       <i class="nav-icon bi bi-list-ul"></i>
                       <p>Kategorileri Listele</p>
                     </a>
@@ -367,7 +381,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../sistem-yonetimi/sifre-guncelle.html" class="nav-link">
+                    <a href="./sistem-yonetimi/sifre-guncelle.html" class="nav-link">
                       <i class="nav-icon bi bi-key-fill"></i>
                       <p>Şifre Güncelle</p>
                     </a>
@@ -375,7 +389,7 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a href="../generate/theme.html" class="nav-link">
+                <a href="./generate/theme.html" class="nav-link">
                   <i class="nav-icon bi bi-palette"></i>
                   <p>Theme Generate</p>
                 </a>
@@ -390,19 +404,19 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../widgets/small-box.html" class="nav-link">
+                    <a href="./widgets/small-box.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Small Box</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../widgets/info-box.html" class="nav-link">
+                    <a href="./widgets/info-box.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>info Box</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../widgets/cards.html" class="nav-link">
+                    <a href="./widgets/cards.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Cards</p>
                     </a>
@@ -420,61 +434,61 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../layout/unfixed-sidebar.html" class="nav-link">
+                    <a href="./layout/unfixed-sidebar.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Default Sidebar</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/fixed-sidebar.html" class="nav-link">
+                    <a href="./layout/fixed-sidebar.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Fixed Sidebar</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/fixed-header.html" class="nav-link">
+                    <a href="./layout/fixed-header.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Fixed Header</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/fixed-footer.html" class="nav-link">
+                    <a href="./layout/fixed-footer.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Fixed Footer</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/fixed-complete.html" class="nav-link">
+                    <a href="./layout/fixed-complete.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Fixed Complete</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/layout-custom-area.html" class="nav-link">
+                    <a href="./layout/layout-custom-area.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Layout <small>+ Custom Area </small></p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/sidebar-mini.html" class="nav-link">
+                    <a href="./layout/sidebar-mini.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Sidebar Mini</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/collapsed-sidebar.html" class="nav-link">
+                    <a href="./layout/collapsed-sidebar.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Sidebar Mini <small>+ Collapsed</small></p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/logo-switch.html" class="nav-link">
+                    <a href="./layout/logo-switch.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Sidebar Mini <small>+ Logo Switch</small></p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../layout/layout-rtl.html" class="nav-link">
+                    <a href="./layout/layout-rtl.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Layout RTL</p>
                     </a>
@@ -491,19 +505,19 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../UI/general.html" class="nav-link">
+                    <a href="./UI/general.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>General</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../UI/icons.html" class="nav-link">
+                    <a href="./UI/icons.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Icons</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../UI/timeline.html" class="nav-link">
+                    <a href="./UI/timeline.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Timeline</p>
                     </a>
@@ -520,7 +534,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../forms/general.html" class="nav-link">
+                    <a href="./forms/general.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>General Elements</p>
                     </a>
@@ -537,7 +551,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../tables/simple.html" class="nav-link">
+                    <a href="./tables/simple.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Simple Tables</p>
                     </a>
@@ -564,13 +578,13 @@
                     </a>
                     <ul class="nav nav-treeview">
                       <li class="nav-item">
-                        <a href="../examples/login.html" class="nav-link">
+                        <a href="./examples/login.html" class="nav-link">
                           <i class="nav-icon bi bi-circle"></i>
                           <p>Login</p>
                         </a>
                       </li>
                       <li class="nav-item">
-                        <a href="../examples/register.html" class="nav-link">
+                        <a href="./examples/register.html" class="nav-link">
                           <i class="nav-icon bi bi-circle"></i>
                           <p>Register</p>
                         </a>
@@ -587,13 +601,13 @@
                     </a>
                     <ul class="nav nav-treeview">
                       <li class="nav-item">
-                        <a href="../examples/login-v2.html" class="nav-link">
+                        <a href="./examples/login-v2.html" class="nav-link">
                           <i class="nav-icon bi bi-circle"></i>
                           <p>Login</p>
                         </a>
                       </li>
                       <li class="nav-item">
-                        <a href="../examples/register-v2.html" class="nav-link">
+                        <a href="./examples/register-v2.html" class="nav-link">
                           <i class="nav-icon bi bi-circle"></i>
                           <p>Register</p>
                         </a>
@@ -601,7 +615,7 @@
                     </ul>
                   </li>
                   <li class="nav-item">
-                    <a href="../examples/lockscreen.html" class="nav-link">
+                    <a href="./examples/lockscreen.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Lockscreen</p>
                     </a>
@@ -610,19 +624,19 @@
               </li>
               <li class="nav-header">DOCUMENTATIONS</li>
               <li class="nav-item">
-                <a href="../docs/introduction.html" class="nav-link">
+                <a href="./docs/introduction.html" class="nav-link">
                   <i class="nav-icon bi bi-download"></i>
                   <p>Installation</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../docs/layout.html" class="nav-link">
+                <a href="./docs/layout.html" class="nav-link">
                   <i class="nav-icon bi bi-grip-horizontal"></i>
                   <p>Layout</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../docs/color-mode.html" class="nav-link">
+                <a href="./docs/color-mode.html" class="nav-link">
                   <i class="nav-icon bi bi-star-half"></i>
                   <p>Color Mode</p>
                 </a>
@@ -637,13 +651,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../docs/components/main-header.html" class="nav-link">
+                    <a href="./docs/components/main-header.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Main Header</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="../docs/components/main-sidebar.html" class="nav-link">
+                    <a href="./docs/components/main-sidebar.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Main Sidebar</p>
                     </a>
@@ -660,7 +674,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../docs/javascript/treeview.html" class="nav-link">
+                    <a href="./docs/javascript/treeview.html" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Treeview</p>
                     </a>
@@ -668,25 +682,25 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a href="../docs/browser-support.html" class="nav-link active">
+                <a href="./docs/browser-support.html" class="nav-link">
                   <i class="nav-icon bi bi-browser-edge"></i>
                   <p>Browser Support</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../docs/how-to-contribute.html" class="nav-link">
+                <a href="./docs/how-to-contribute.html" class="nav-link">
                   <i class="nav-icon bi bi-hand-thumbs-up-fill"></i>
                   <p>How To Contribute</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../docs/faq.html" class="nav-link">
+                <a href="./docs/faq.html" class="nav-link">
                   <i class="nav-icon bi bi-question-circle-fill"></i>
                   <p>FAQ</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="../docs/license.html" class="nav-link">
+                <a href="./docs/license.html" class="nav-link">
                   <i class="nav-icon bi bi-patch-check-fill"></i>
                   <p>License</p>
                 </a>
@@ -784,72 +798,144 @@
       <!--end::Sidebar-->
       <!--begin::App Main-->
       <main class="app-main">
-        <!--begin::App Content Header-->
         <div class="app-content-header">
-          <!--begin::Container-->
           <div class="container-fluid">
-            <!--begin::Row-->
             <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">Browser Support</h3></div>
+              <div class="col-sm-6"><h3 class="mb-0">Kategori</h3></div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="#">Docs</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Browser Support</li>
+                  <li class="breadcrumb-item"><a href="#">Kategori</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Kategori Ekle / Kategori Listesi
+                  </li>
                 </ol>
               </div>
             </div>
-            <!--end::Row-->
           </div>
-          <!--end::Container-->
         </div>
-        <!--end::App Content Header-->
-        <!--begin::App Content-->
         <div class="app-content">
-          <!--begin::Container-->
           <div class="container-fluid">
-            <p>AdminLTE comes with the same browser support as Bootstrap 5.</p>
-            <blockquote>
-              <h5 id="excerpt-from-bootstraps-official-documentation">
-                Excerpt from Bootstrap’s official Documentation!
-              </h5>
-              <p>
-                Bootstrap supports the <strong>latest, stable releases</strong> of all major
-                browsers and platforms.
-              </p>
-              <p>
-                For more details
-                <a
-                  href="https://getbootstrap.com/docs/5.0/getting-started/browsers-devices/#supported-browsers"
-                  >look here</a
-                >.
-              </p>
-            </blockquote>
-            <p>
-              You can find our supported range of browsers and their versions in
-              <a href="https://github.com/ColorlibHQ/AdminLTE/blob/master/.browserslistrc"
-                >our .browserslistrc file</a
-              >:
-            </p>
-            <pre
-              class="astro-code dark-plus"
-              style="background-color: #1e1e1e; color: #d4d4d4; overflow-x: auto"
-              tabindex="0"
-              data-language="plaintext"
-            ><code><span class="line"><span># https://github.com/browserslist/browserslist#readme</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>&gt;= 0.5%</span></span>
-<span class="line"><span>last 2 major versions</span></span>
-<span class="line"><span>not dead</span></span>
-<span class="line"><span>Chrome &gt;= 60</span></span>
-<span class="line"><span>Firefox &gt;= 60</span></span>
-<span class="line"><span>Firefox ESR</span></span>
-<span class="line"><span>iOS &gt;= 12</span></span>
-<span class="line"><span>Safari &gt;= 12</span></span>
-<span class="line"><span>not Explorer &lt;= 11</span></span></code></pre>
+            <div id="kategori-liste-view" class="card card-primary card-outline">
+              <div class="card-header d-flex align-items-center gap-2">
+                <h3 class="card-title mb-0">Kategori Listesi</h3>
+                <div class="d-flex gap-2">
+                  <button
+                    id="kategoriImportButton"
+                    type="button"
+                    class="btn btn-outline-info btn-sm notranslate"
+                    translate="no"
+                    onclick="kategoriExcelSec()"
+                  >
+                    Excel Yükle
+                  </button>
+                  <button
+                    id="kategoriExportButton"
+                    type="button"
+                    class="btn btn-outline-success btn-sm notranslate"
+                    translate="no"
+                    onclick="kategorileriExcelIndir()"
+                  >
+                    Excel İndir
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    onclick="kategoriFormuGoster()"
+                  >
+                    Kategori Ekle
+                  </button>
+                </div>
+                <input
+                  id="kategoriImportFileInput"
+                  type="file"
+                  class="d-none"
+                  accept=".xlsx,.xls"
+                />
+                <button
+                  id="kategoriRefreshButton"
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm ms-auto"
+                  onclick="kategorileriYenile()"
+                >
+                  Yenile
+                </button>
+              </div>
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 80px">#</th>
+                      <th>Adı</th>
+                      <th>Açıklama</th>
+                      <th style="width: 160px">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kategoriTablosu">
+                    <tr>
+                      <td colspan="4" class="text-center">Yükleniyor...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex justify-content-center">
+                <nav aria-label="Kategori sayfalama">
+                  <ul id="kategoriPagination" class="pagination pagination-sm mb-0"></ul>
+                </nav>
+              </div>
+            </div>
+            <div
+              id="kategori-form-view"
+              class="card card-success card-outline"
+              style="display: none"
+            >
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 id="kategoriFormBaslik" class="card-title mb-0">Kategori Ekle</h3>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm"
+                  onclick="kategoriListesiGoster()"
+                >
+                  Listeye Dön
+                </button>
+              </div>
+              <form id="kategoriForm">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label for="kategoriName" class="form-label">Kategori Adı</label>
+                      <input
+                        id="kategoriName"
+                        name="name"
+                        type="text"
+                        class="form-control"
+                        placeholder="Kategori adını yazın"
+                        required
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label for="kategoriDescription" class="form-label">Açıklama</label>
+                      <textarea
+                        id="kategoriDescription"
+                        name="description"
+                        class="form-control"
+                        rows="6"
+                        placeholder="Kategori açıklamasını yazın"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer d-flex gap-2 justify-content-end">
+                  <button type="button" class="btn btn-secondary" onclick="kategoriListesiGoster()">
+                    Vazgeç
+                  </button>
+                  <button id="kategoriFormSubmitBtn" type="submit" class="btn btn-success">
+                    Kaydet
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-          <!--end::Container-->
         </div>
-        <!--end::App Content-->
       </main>
       <!--end::App Main-->
       <!--begin::Footer-->
@@ -868,7 +954,6 @@
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
-    <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
@@ -885,11 +970,11 @@
       crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="../js/adminlte.js"></script>
+    <script src="./js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
       (function () {
-        const deploymentPath = '../';
+        const deploymentPath = './';
         const API_BASE_URL = 'http://testmb.runasp.net/api';
 
         const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
@@ -1311,7 +1396,524 @@
       })();
     </script>
     <!--end::OverlayScrollbars Configure-->
-    <!--end::Script-->
+    <script>
+      /* eslint-disable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this, unicorn/prefer-string-slice */
+      // TOAST & NOTIFICATION STYLES
+      const toastStyles = `
+        .toast-notification {
+          min-width: 350px;
+          padding: 16px 20px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-size: 14px;
+          font-weight: 500;
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast-notification.success {
+          background-color: #28a745;
+          color: white;
+          border-left: 4px solid #207535;
+        }
+        
+        .toast-notification.error {
+          background-color: #dc3545;
+          color: white;
+          border-left: 4px solid #a02830;
+        }
+        
+        .toast-notification-bar {
+          margin-top: 8px;
+          width: 100%;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        
+        .toast-notification-progress {
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          animation: progress 4s linear forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+      `;
+
+      // Toast Styles Ekle
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = toastStyles;
+      document.head.appendChild(styleSheet);
+
+      // TOAST NOTIFICATION FUNCTION
+      const gosterToast = (mesaj, tip = 'success') => {
+        const container = document.getElementById('toast-container');
+
+        const toastDiv = document.createElement('div');
+        toastDiv.className = `toast-notification ${tip}`;
+
+        const messageSpan = document.createElement('div');
+        messageSpan.textContent = mesaj;
+        messageSpan.style.marginBottom = '8px';
+
+        const barDiv = document.createElement('div');
+        barDiv.className = 'toast-notification-bar';
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'toast-notification-progress';
+        barDiv.appendChild(progressDiv);
+
+        toastDiv.appendChild(messageSpan);
+        toastDiv.appendChild(barDiv);
+        container.appendChild(toastDiv);
+
+        setTimeout(() => {
+          toastDiv.style.animation = 'slideOut 0.3s ease-out forwards';
+          setTimeout(() => {
+            toastDiv.remove();
+          }, 300);
+        }, 4000);
+      };
+
+      let aktifSayfa = 1;
+      let sayfaBoyutu = 10;
+      let toplamSayfa = 1;
+      let duzenlenecekKategoriId = null;
+      let sonYuklenenKategoriler = [];
+      const EXCEL_IMPORT_LABEL = 'Excel Yükle';
+      const EXCEL_EXPORT_LABEL = 'Excel İndir';
+
+      const formElement = document.getElementById('kategoriForm');
+      const formBaslikElement = document.getElementById('kategoriFormBaslik');
+      const formSubmitButtonElement = document.getElementById('kategoriFormSubmitBtn');
+      const nameInputElement = document.getElementById('kategoriName');
+      const descriptionInputElement = document.getElementById('kategoriDescription');
+      const importFileInputElement = document.getElementById('kategoriImportFileInput');
+      const importButtonElement = document.getElementById('kategoriImportButton');
+      const exportButtonElement = document.getElementById('kategoriExportButton');
+
+      const addEndpoint = `${API_BASE_URL}/Category/add`;
+      const updateEndpoint = `${API_BASE_URL}/Category/Update`;
+      const exportEndpoint = `${API_BASE_URL}/Category/ExportCategories`;
+      const importEndpoint = `${API_BASE_URL}/Category/Import`;
+
+      const excelButonEtiketleriniSifirla = () => {
+        if (importButtonElement) {
+          importButtonElement.textContent = EXCEL_IMPORT_LABEL;
+        }
+
+        if (exportButtonElement) {
+          exportButtonElement.textContent = EXCEL_EXPORT_LABEL;
+        }
+      };
+
+      const formuEkleModunaAl = () => {
+        duzenlenecekKategoriId = null;
+        if (formBaslikElement) {
+          formBaslikElement.textContent = 'Kategori Ekle';
+        }
+
+        if (formSubmitButtonElement) {
+          formSubmitButtonElement.textContent = 'Kaydet';
+          formSubmitButtonElement.classList.remove('btn-warning');
+          formSubmitButtonElement.classList.add('btn-success');
+        }
+      };
+
+      window.kategorileriExcelIndir = async function () {
+        const exportButton = exportButtonElement;
+
+        if (exportButton) {
+          exportButton.disabled = true;
+          exportButton.textContent = 'İndiriliyor...';
+        }
+
+        try {
+          const response = await fetch(exportEndpoint, {
+            method: 'GET',
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const blob = await response.blob();
+          if (!blob || blob.size === 0) {
+            throw new Error('Boş dosya döndü.');
+          }
+
+          const downloadUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = 'Kategoriler.xlsx';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(downloadUrl);
+
+          gosterToast('Kategoriler Excel olarak indirildi.', 'success');
+        } catch (error) {
+          console.error('Kategori Excel indirme hatası:', error);
+          gosterToast(`Excel indirilemedi: ${error.message}`, 'error');
+        } finally {
+          if (exportButton) {
+            exportButton.disabled = false;
+            exportButton.textContent = EXCEL_EXPORT_LABEL;
+          }
+        }
+      };
+
+      window.kategorileriYenile = function () {
+        kategorileriGetir(aktifSayfa);
+      };
+
+      window.kategoriExcelSec = function () {
+        if (!importFileInputElement) {
+          gosterToast('Dosya seçici bulunamadı.', 'error');
+          return;
+        }
+
+        importFileInputElement.click();
+      };
+
+      window.kategoriExcelYukle = async function (file) {
+        if (!file) {
+          gosterToast('Lütfen bir Excel dosyası seçin.', 'error');
+          return;
+        }
+
+        const fileName = (file.name || '').toLowerCase();
+        if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+          gosterToast('Sadece .xlsx veya .xls dosyası yükleyebilirsiniz.', 'error');
+          return;
+        }
+
+        if (importButtonElement) {
+          importButtonElement.disabled = true;
+          importButtonElement.textContent = 'Yükleniyor...';
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch(importEndpoint, {
+            method: 'POST',
+            body: formData,
+          });
+
+          const responseText = await response.text();
+
+          if (!response.ok) {
+            throw new Error(responseText || `HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          gosterToast(responseText || 'Kategoriler başarıyla içeri aktarıldı.', 'success');
+          kategorileriYenile();
+        } catch (error) {
+          console.error('Kategori Excel içeri aktarma hatası:', error);
+          gosterToast(`Excel yüklenemedi: ${error.message}`, 'error');
+        } finally {
+          if (importButtonElement) {
+            importButtonElement.disabled = false;
+            importButtonElement.textContent = EXCEL_IMPORT_LABEL;
+          }
+
+          if (importFileInputElement) {
+            importFileInputElement.value = '';
+          }
+        }
+      };
+
+      if (importFileInputElement) {
+        importFileInputElement.addEventListener('change', (event) => {
+          const selectedFile = event.target?.files?.[0];
+          if (selectedFile) {
+            kategoriExcelYukle(selectedFile);
+          }
+        });
+      }
+
+      // 1. SAYFA AÇILIR AÇILMAZ ÇALIŞACAK KOD (Verileri getiren tetikleyici)
+      document.addEventListener('DOMContentLoaded', () => {
+        excelButonEtiketleriniSifirla();
+        kategorileriYenile(); // Sayfa yüklendiğinde hemen API'ye git
+      });
+
+      formElement.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const payload = {
+          name: nameInputElement.value.trim(),
+          description: descriptionInputElement.value.trim() || null,
+        };
+
+        if (!payload.name) {
+          gosterToast('Kategori adı zorunludur.', 'error');
+          return;
+        }
+
+        const isUpdateMode = Boolean(duzenlenecekKategoriId);
+        const requestBody = isUpdateMode ? { ...payload, id: duzenlenecekKategoriId } : payload;
+
+        const requestUrl = isUpdateMode ? updateEndpoint : addEndpoint;
+        const requestMethod = isUpdateMode ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch(requestUrl, {
+            method: requestMethod,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const successMsg = isUpdateMode
+            ? 'Kategori başarıyla güncellendi!'
+            : 'Kategori başarıyla eklendi!';
+          gosterToast(successMsg, 'success');
+          formElement.reset();
+          formuEkleModunaAl();
+          kategoriListesiGoster();
+        } catch (error) {
+          console.error('Kategori kaydetme hatası:', error);
+          gosterToast(`Kategori kaydedilemedi: ${error.message}`, 'error');
+        }
+      });
+
+      // 2. GÖRÜNÜM DEĞİŞTİRİCİLER
+      window.kategoriFormuGoster = function () {
+        document.getElementById('kategori-liste-view').style.display = 'none';
+        document.getElementById('kategori-form-view').style.display = 'block';
+        document.getElementById('kategoriForm').reset();
+        formuEkleModunaAl();
+      };
+
+      window.kategoriListesiGoster = function () {
+        document.getElementById('kategori-form-view').style.display = 'none';
+        document.getElementById('kategori-liste-view').style.display = 'block';
+        formuEkleModunaAl();
+        kategorileriGetir(aktifSayfa);
+      };
+
+      window.kategoriDuzenle = function (kategoriId) {
+        const secilenKategori = sonYuklenenKategoriler.find((kategori) => {
+          const id = kategori?.id || kategori?.categoryId || kategori?.Id || kategori?.CategoryId;
+          return String(id) === String(kategoriId);
+        });
+
+        if (!secilenKategori) {
+          gosterToast('Düzenlenecek kategori bulunamadı.', 'error');
+          return;
+        }
+
+        duzenlenecekKategoriId =
+          secilenKategori.id ||
+          secilenKategori.categoryId ||
+          secilenKategori.Id ||
+          secilenKategori.CategoryId;
+        nameInputElement.value = secilenKategori.name || secilenKategori.Name || '';
+        descriptionInputElement.value =
+          secilenKategori.description || secilenKategori.Description || '';
+
+        if (formBaslikElement) {
+          formBaslikElement.textContent = 'Kategori Düzenle';
+        }
+
+        if (formSubmitButtonElement) {
+          formSubmitButtonElement.textContent = 'Güncelle';
+          formSubmitButtonElement.classList.remove('btn-success');
+          formSubmitButtonElement.classList.add('btn-warning');
+        }
+
+        document.getElementById('kategori-liste-view').style.display = 'none';
+        document.getElementById('kategori-form-view').style.display = 'block';
+      };
+
+      window.kategoriSil = async function (kategoriId) {
+        const onay = confirm('Bu kategoriyi silmek istediğinizden emin misiniz?');
+        if (!onay) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/Category/Delete/${kategoriId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          gosterToast('Kategori başarıyla silindi!', 'success');
+          kategorileriGetir(aktifSayfa);
+        } catch (error) {
+          console.error('Kategori silme hatası:', error);
+          gosterToast(`Kategori silinemedi: ${error.message}`, 'error');
+        }
+      };
+
+      window.sayfayaGit = function (sayfaNo) {
+        if (sayfaNo < 1 || sayfaNo > toplamSayfa) {
+          return;
+        }
+
+        aktifSayfa = sayfaNo;
+        kategorileriGetir(aktifSayfa);
+      };
+
+      const sayfalamaCiz = () => {
+        const pagination = document.getElementById('kategoriPagination');
+
+        if (!pagination || toplamSayfa <= 1) {
+          if (pagination) {
+            pagination.innerHTML = '';
+          }
+          return;
+        }
+
+        let html = '';
+        for (let i = 1; i <= toplamSayfa; i++) {
+          html += `
+            <li class="page-item ${i === aktifSayfa ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="sayfayaGit(${i}); return false;">${i}</a>
+            </li>
+          `;
+        }
+
+        pagination.innerHTML = html;
+      };
+
+      // 3. API'DEN VERİ ÇEKME MOTORU
+      window.kategorileriGetir = function (sayfaNo = aktifSayfa) {
+        aktifSayfa = sayfaNo;
+
+        const tablo = document.getElementById('kategoriTablosu');
+        const pagination = document.getElementById('kategoriPagination');
+        tablo.innerHTML = '<tr><td colspan="4" class="text-center">Yükleniyor...</td></tr>';
+        if (pagination) {
+          pagination.innerHTML = '';
+        }
+
+        const listEndpoints = [`${API_BASE_URL}/Category/GetAll`];
+
+        const fetchFromEndpoint = async (endpoint) => {
+          const response = await fetch(`${endpoint}?page=${aktifSayfa}&pageSize=${sayfaBoyutu}`);
+
+          if (response.status === 404) {
+            return null;
+          }
+
+          if (!response.ok) {
+            const responseText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${responseText || response.statusText}`);
+          }
+
+          const responseText = await response.text();
+
+          if (!responseText) {
+            return [];
+          }
+
+          try {
+            return JSON.parse(responseText);
+          } catch {
+            throw new Error('API JSON döndürmedi. Yanıt formatını kontrol et.');
+          }
+        };
+
+        (async () => {
+          for (const endpoint of listEndpoints) {
+            const data = await fetchFromEndpoint(endpoint);
+            if (data !== null) {
+              return data;
+            }
+          }
+
+          throw new Error('HTTP 404: Uygun liste endpointi bulunamadı.');
+        })()
+          .then((data) => {
+            tablo.innerHTML = '';
+
+            const liste = Array.isArray(data) ? data : data?.items || data?.Items || [];
+
+            sayfaBoyutu = data?.pageSize || data?.PageSize || sayfaBoyutu;
+            aktifSayfa = data?.page || data?.Page || aktifSayfa;
+
+            const totalCount = data?.totalCount || data?.TotalCount || liste.length;
+            toplamSayfa =
+              data?.totalPages ||
+              data?.TotalPages ||
+              Math.max(1, Math.ceil(totalCount / sayfaBoyutu));
+
+            if (!liste || liste.length === 0) {
+              tablo.innerHTML =
+                '<tr><td colspan="4" class="text-center">Henüz kategori yok.</td></tr>';
+              sayfalamaCiz();
+              return;
+            }
+
+            sonYuklenenKategoriler = liste;
+
+            // Verileri tabloya döşe
+            liste.forEach((kategori, index) => {
+              const satirNo = (aktifSayfa - 1) * sayfaBoyutu + index + 1;
+              const kategoriId =
+                kategori.id || kategori.categoryId || kategori.Id || kategori.CategoryId || '';
+              const description = (kategori.description || kategori.Description || '').substring(
+                0,
+                100,
+              );
+              tablo.innerHTML += `
+                          <tr>
+                  <td>${satirNo}</td>
+                              <td>${kategori.name || ''}</td>
+                              <td>${description || '-'}</td>
+                              <td>
+                          <button class="btn btn-warning btn-sm" onclick="kategoriDuzenle('${kategoriId}')">Düzenle</button>
+                                  <button class="btn btn-danger btn-sm" onclick="kategoriSil('${kategoriId}')">Sil</button>
+                              </td>
+                          </tr>
+                      `;
+            });
+
+            sayfalamaCiz();
+          })
+          .catch((error) => {
+            console.error('Hata:', error);
+            toplamSayfa = 1;
+            tablo.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Kategori listesi alınamadı: ${error.message}</td></tr>`;
+          });
+      };
+      /* eslint-enable indent, unicorn/prefer-dom-node-append, operator-linebreak, unicorn/prefer-global-this, unicorn/prefer-string-slice */
+    </script>
   </body>
   <!--end::Body-->
 </html>
